@@ -2,8 +2,7 @@ import {useForm} from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 export const Register = () => {
-const {register, handleSubmit, reset, formState: {errors},
-    }=useForm()
+    const {register, handleSubmit, reset, formState: {errors}} = useForm();
 
     console.log(errors);
 
@@ -13,6 +12,7 @@ const {register, handleSubmit, reset, formState: {errors},
     }
 
     return(
+        <>
         <div className="flex items-center justify-center bg-gray-100">
             <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md bg-white p-8 rounded shadow-md">
                 {/* Heading */}
@@ -116,5 +116,6 @@ const {register, handleSubmit, reset, formState: {errors},
             </div>
             </form>
         </div>
+    </>
     );
 }
