@@ -18,10 +18,8 @@ function App() {
     <>
     {/* <NavBar/>   */}
     <Routes>
-      <Route path='/' element={<Homepage/>}/>
       <Route path='/register' element={<Register/>}/>
       <Route path='/login' element={<Login/>}/>
-      <Route path='/userlist' element={<UserTable/>}/>
     </Routes>
     </>
   );
