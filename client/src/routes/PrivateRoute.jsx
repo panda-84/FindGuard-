@@ -1,0 +1,7 @@
+const PublicRoute = () => {
+    return (
+        <>
+        
+        </>
+    )
+}
