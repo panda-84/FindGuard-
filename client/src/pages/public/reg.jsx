@@ -1,15 +1,39 @@
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import bgImage from "../../assets/image.png";
 import logo from "../../assets/Untitled.png";
+import { RegisterSchema } from "../../schema/reg.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router-dom";
+import { useApi } from "../../hooks/useAPI";
 
-export const Register = () => {
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Form Values...", data);
+ const Register = () => {
+
+  const navigate = useNavigate();
+  const [backendSuccess, setBackendSuccess] = useState("");
+  
+
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    resolver: zodResolver(RegisterSchema),
+  });
+  const { callApi }= useApi();
+  
+
+console.log(errors);
+  const handleRegister = async (userdata) => {
+    try {
+      setBackendSuccess("");
+      const res = await callApi("POST", "/auth/register", { data: userdata });
+      setBackendSuccess(res.data.message || "Registered successfully");
+      console.log("Registration Successful:", res);
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (err) {
+      console.log(err.message);
+    }
   };
-
   return (
     <div
       className="min-h-screen w-full bg-cover bg-center bg-no-repeat"
@@ -17,7 +41,7 @@ export const Register = () => {
     >
       <div className="  min-h-screen w-full flex items-center justify-center bg-opacity-100">
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(handleRegister)}
           
           className="w-[950px] h-[550px] rounded-3xl shadow-md flex bg-black/20 backdrop-blur-md 
             shadow-[0_0_20px_rgba(168,85,248,0.5)]
@@ -33,26 +57,14 @@ export const Register = () => {
 
               {/* First Name */}
               <div>
-                <label className="block text-white text-sm mb-2">First Name *</label>
+                <label className="block text-white text-sm mb-2">Full Name *</label>
                 <input
                   type="text"
-                  placeholder="First Name"
-                  {...register("firstName", { required: "First Name is required" })}
+                  placeholder="Full Name"
+                  {...register("fullName", { required: "Full Name is required" })}
                   className="hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] w-full px-3 py-2 border rounded-lg bg-blue-500/15 text-white border-none outline-none"
                 />
-                {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName.message}</p>}
-              </div>
-
-              {/* Last Name */}
-              <div>
-                <label className="block text-white text-sm mb-2">Last Name *</label>
-                <input
-                  type="text"
-                  placeholder="Last Name"
-                  {...register("lastName", { required: "Last Name is required" })}
-                  className="hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] w-full px-3 py-2 border rounded-lg bg-blue-500/15 text-white border-none outline-none"
-                />
-                {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName.message}</p>}
+                {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>}
               </div>
 
               {/* Email */}
@@ -80,6 +92,19 @@ export const Register = () => {
                 />
                 {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>}
               </div>
+
+              {/* dob */}
+              <div>
+                <label className="block text-white text-sm mb-2">Date of Birth *</label>
+                <input
+                  type="date"
+                  placeholder="Date of Birth"
+                  {...register("dob", { required: "Date of Birth is required" })}
+                  className="hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] w-full px-3 py-2 border rounded-lg bg-blue-500/15 text-white border-none outline-none"
+                />
+                {errors.dob && <p className="text-red-500 text-xs mt-1">{errors.dob.message}</p>}
+              </div>
+
 
               {/* Password */}
               <div>
@@ -129,3 +154,4 @@ export const Register = () => {
     </div>
   );
 };
+export default Register;
