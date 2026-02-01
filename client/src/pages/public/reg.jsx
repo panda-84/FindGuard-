@@ -51,8 +51,9 @@ const handleRegister = async (data) => {
         <form
           onSubmit={handleSubmit(handleRegister)}
           className="w-[950px] h-[550px] rounded-3xl shadow-md flex bg-black/20 backdrop-blur-md
-            shadow-[0_0_20px_rgba(168,85,248,0.5)]
+           
             hover:shadow-[0_0_40px_rgba(168,85,247,0.9)]
+            shadow-[0_0_20px_rgba(168,85,248,0.5)]
             transition duration-300 p-14"
         >
           {/* LEFT SIDE (Form) */}
@@ -136,7 +137,7 @@ const handleRegister = async (data) => {
 
             {/* Register Button */}
             <div className="w-[400px] mx-auto flex justify-center mt-6">
-              <button className="flex items-center justify-center w-[300px] bg-blue-500 hover:bg-blue-300 text-white font-bold py-2 px-4 rounded-3xl transition duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]">
+              <button className="flex items-center justify-center w-[300px] bg-blue-700 hover:bg-blue-300 text-white font-bold py-2 px-4 rounded-3xl transition duration-300 hover:shadow-[0_0_30px_rgba(168,85,247,0.5)]">
                 Register
               </button>
             </div>

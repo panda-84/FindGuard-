@@ -64,7 +64,7 @@ export const login = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const users = await Users.findAll({
-      attributes: ["id", "fullName", "email", "role", "createdAt", "updatedAt"],
+      attributes: ["id", "name", "email", "createdAt", "updatedAt"],
     });
     res.status(200).json({ data: users });
   } catch (error) {
@@ -76,20 +76,19 @@ export const getAllUsers = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { fullName, email, password, role } = req.body;
+    const { name, email, password, role } = req.body;
 
     const user = await Users.findByPk(id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (fullName) user.fullName = fullName;
+    if (name) user.name = name;
     if (email) user.email = email;
-    if (role) user.role = role;
     if (password) user.password = await bcrypt.hash(password, 10);
 
     await user.save();
     res.status(200).json({
       message: "User updated successfully",
-      data: { id: user.id, fullName: user.fullName, email: user.email, role: user.role },
+      data: { id: user.id, name: user.name, email: user.email },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -100,7 +99,7 @@ export const getUserById = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await Users.findByPk(id, {
-      attributes: ["id", "fullName", "email", "role", "createdAt", "updatedAt"],
+      attributes: ["id", "name", "email", "createdAt", "updatedAt"],
     });
     if (!user) return res.status(404).json({ message: "User not found" });
 
