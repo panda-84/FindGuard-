@@ -1,10 +1,17 @@
 import React from 'react';
+import securityImage from '../../assets/ads/ad1.png'; // Make sure to have an image at this path
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-200 to-blue-400">
+    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-black">
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="bg-gray-500 h-64 rounded-lg mb-8"></div>
+<div className="h-64 rounded-lg mb-8 overflow-hidden">
+  <img 
+    src={securityImage}
+    alt="Security Company" 
+    className="w-full h-full object-cover"
+  />
+</div>
         
         <div className="bg-gray-300 rounded-lg p-8 mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">About us</h2>

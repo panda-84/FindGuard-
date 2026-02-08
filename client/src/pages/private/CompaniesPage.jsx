@@ -11,11 +11,10 @@ export default function CompaniesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-200 to-blue-400">
-      <main className="max-w-7xl mx-auto px-6 py-12">
+<div className="min-h-screen bg-gradient-to-b from-blue-900 to-black">      <main className="max-w-7xl mx-auto px-6 py-12">
         <div className="bg-gray-500 h-48 rounded-lg mb-12"></div>
         
-        <h1 className="text-5xl font-bold text-center text-gray-800 mb-12">Companies</h1>
+        <h1 className="text-5xl font-bold text-center text-white mb-12">Companies</h1>
         
         <div className="space-y-6 max-w-4xl mx-auto">
           {companies.map((company) => (

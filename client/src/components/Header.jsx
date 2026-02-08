@@ -3,12 +3,12 @@ import logo from '../assets/Untitled.png';
 
 export default function Header({ currentPage, setCurrentPage }) {
   return (
-    <header className="bg-blue-500 shadow-md h-[150px]">
-      <div className="flex items-center justify-between">
+    <header className="bg-black shadow-lg h-[160px] align-middle flex items-center">
+      <div className="flex items-center ">
         <div className="flex items-center space-x-3">
           <img src={logo} alt="Logo" className="h-[200px] w-[150px]" />
         </div>
-        <nav className="flex space-x-2">
+        <nav className="space-x-9 ml-[450px]">
           <button
             onClick={() => setCurrentPage('home')}
             className={`px-6 py-2 rounded-lg font-medium transition-colors ${

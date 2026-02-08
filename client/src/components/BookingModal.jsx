@@ -1,64 +1,99 @@
-import React, { useState } from 'react';
-import { X, Calendar, Clock, DollarSign, User } from 'lucide-react';
+import React, { useState } from "react";
+import { X, Calendar, Clock, CreditCard } from "lucide-react";
 
 export default function BookingModal({ guard, onClose, companyName }) {
+  const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    startDate: '',
-    durationType: 'hours',
-    duration: '',
-    hours: '8',
-    contactName: '',
-    contactPhone: '',
-    contactEmail: '',
-    address: '',
-    specialRequirements: '',
+    startDate: "",
+    durationType: "hours",
+    duration: "",
+    hours: "8",
+    contactName: "",
+    contactPhone: "",
+    contactEmail: "",
+    address: "",
+    specialRequirements: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    // Validations
+    if (name === "contactName" && value.length > 20) return;
+    if (["contactPhone", "duration", "hours"].includes(name) && !/^\d*$/.test(value)) return;
+
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: "" }); // Clear error on change
   };
+
+  const usdToNpr = (usd) => Math.round(usd * 140);
 
   const calculateCost = () => {
     if (!formData.duration) return 0;
-    
     let totalHours = 0;
-    if (formData.durationType === 'hours') {
-      totalHours = parseInt(formData.duration) || 0;
-    } else if (formData.durationType === 'days') {
-      totalHours = (parseInt(formData.duration) || 0) * (parseInt(formData.hours) || 8);
-    } else if (formData.durationType === 'months') {
-      totalHours = (parseInt(formData.duration) || 0) * 30 * (parseInt(formData.hours) || 8);
-    }
-    
-    return totalHours * guard.hourlyRate;
+    if (formData.durationType === "hours") totalHours = parseInt(formData.duration) || 0;
+    if (formData.durationType === "days") totalHours = (parseInt(formData.duration) || 0) * (parseInt(formData.hours) || 8);
+    if (formData.durationType === "months") totalHours = (parseInt(formData.duration) || 0) * 30 * (parseInt(formData.hours) || 8);
+    return usdToNpr(totalHours * guard.hourlyRate);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // Validate current step inputs
+  const validateStep = () => {
+    const newErrors = {};
+    if (step === 1) {
+      if (!formData.startDate) newErrors.startDate = "Start date is required";
+      if (!formData.duration) newErrors.duration = "Duration is required";
+    }
+    if (step === 2) {
+      if (!formData.contactName) newErrors.contactName = "Name is required";
+      if (!formData.contactPhone) newErrors.contactPhone = "Phone is required";
+      if (!formData.contactEmail) newErrors.contactEmail = "Email is required";
+      if (!formData.address) newErrors.address = "Address is required";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (!validateStep()) return;
+    setStep(step + 1);
+  };
+
+  const handlePrev = () => setStep(step - 1);
+
+  const handleConfirmPayment = () => {
+    if (!validateStep()) return;
     setBookingConfirmed(true);
   };
 
   const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    if (e.target === e.currentTarget) onClose();
   };
 
+  // Confirmation popup
   if (bookingConfirmed) {
     return (
-      <div 
+      <div
         className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
         onClick={handleBackdropClick}
       >
-        <div className="bg-white rounded-lg max-w-md w-full p-8 text-center">
-          <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+        <div className="bg-white rounded-xl max-w-md w-full p-8 text-center shadow-lg">
+          <div className="w-20 h-20 bg-green-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <svg
+              className="w-10 h-10 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Booking Confirmed!</h2>
@@ -67,7 +102,7 @@ export default function BookingModal({ guard, onClose, companyName }) {
           </p>
           <button
             onClick={onClose}
-            className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+            className="bg-sky-500 text-white px-6 py-3 rounded-lg hover:bg-sky-600 transition-colors font-medium"
           >
             Close
           </button>
@@ -77,208 +112,178 @@ export default function BookingModal({ guard, onClose, companyName }) {
   }
 
   return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+    <div
+      className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 overflow-auto"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg max-w-2xl w-full my-8">
-        <div className="bg-blue-500 text-white p-6 rounded-t-lg flex justify-between items-center">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-xl mx-auto overflow-hidden">
+        {/* Header */}
+        <div className="bg-sky-500 text-white p-5 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold">Book Security Guard</h2>
-            {companyName && <p className="text-blue-100 text-sm mt-1">via {companyName}</p>}
+            <h2 className="text-xl font-bold">Book Security Guard</h2>
+            {companyName && <p className="text-sky-100 text-sm mt-1">via {companyName}</p>}
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:bg-blue-600 rounded-full p-2 transition-colors"
+            className="text-white hover:bg-sky-600 rounded-full p-2 transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-6">
-          {/* Guard Info */}
-          <div className="bg-gray-100 rounded-lg p-4 mb-6 flex items-center">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold mr-4">
-              {guard.image}
-            </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-gray-800">{guard.name}</h3>
-              <p className="text-gray-600">{guard.specialty} Security</p>
-              <div className="flex items-center mt-1">
-                <span className="text-yellow-500 mr-1">★</span>
-                <span className="text-gray-700 font-medium">{guard.rating}</span>
-                <span className="mx-2 text-gray-400">|</span>
-                <span className="text-green-600 font-semibold">${guard.hourlyRate}/hr</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Booking Form */}
-          <form onSubmit={handleSubmit}>
+        <div className="p-6 space-y-6">
+          {/* Step 1 */}
+          {step === 1 && (
             <div className="space-y-4">
-              {/* Start Date */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  <Calendar className="w-4 h-4 inline mr-1" />
-                  Start Date
-                </label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+              <label className="block text-sm font-medium text-gray-700">Start Date</label>
+              <input
+                type="date"
+                name="startDate"
+                value={formData.startDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              />
+              {errors.startDate && <p className="text-red-500 text-sm">{errors.startDate}</p>}
 
-              {/* Duration Type */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  <Clock className="w-4 h-4 inline mr-1" />
-                  Duration Type
-                </label>
-                <select
-                  name="durationType"
-                  value={formData.durationType}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="hours">Hours</option>
-                  <option value="days">Days</option>
-                  <option value="months">Months</option>
-                </select>
-              </div>
+              <label className="block text-sm font-medium text-gray-700">Duration Type</label>
+              <select
+                name="durationType"
+                value={formData.durationType}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              >
+                <option value="hours">Hours</option>
+                <option value="days">Days</option>
+                <option value="months">Months</option>
+              </select>
 
-              {/* Duration */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Number of {formData.durationType}
-                  </label>
-                  <input
-                    type="number"
-                    name="duration"
-                    value={formData.duration}
-                    onChange={handleChange}
-                    min="1"
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+              <input
+                type="text"
+                name="duration"
+                placeholder={`Number of ${formData.durationType}`}
+                value={formData.duration}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              />
+              {errors.duration && <p className="text-red-500 text-sm">{errors.duration}</p>}
 
-                {formData.durationType !== 'hours' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Hours per day
-                    </label>
-                    <input
-                      type="number"
-                      name="hours"
-                      value={formData.hours}
-                      onChange={handleChange}
-                      min="1"
-                      max="24"
-                      required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Contact Information */}
-              <div className="border-t pt-4 mt-4">
-                <h3 className="font-semibold text-gray-800 mb-3">Contact Information</h3>
-                
-                <div className="space-y-3">
-                  <input
-                    type="text"
-                    name="contactName"
-                    placeholder="Full Name"
-                    value={formData.contactName}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  
-                  <input
-                    type="tel"
-                    name="contactPhone"
-                    placeholder="Phone Number"
-                    value={formData.contactPhone}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  
-                  <input
-                    type="email"
-                    name="contactEmail"
-                    placeholder="Email Address"
-                    value={formData.contactEmail}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  
-                  <textarea
-                    name="address"
-                    placeholder="Service Address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    required
-                    rows="2"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              {/* Special Requirements */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Special Requirements (Optional)
-                </label>
-                <textarea
-                  name="specialRequirements"
-                  value={formData.specialRequirements}
-                  onChange={handleChange}
-                  rows="3"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Any specific requirements or instructions..."
-                />
-              </div>
-
-              {/* Cost Summary */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-700 font-medium">
-                    <DollarSign className="w-4 h-4 inline mr-1" />
-                    Estimated Total Cost:
-                  </span>
-                  <span className="text-2xl font-bold text-blue-600">
-                    ${calculateCost().toLocaleString()}
-                  </span>
-                </div>
-              </div>
-
-              {/* Submit Buttons */}
-              <div className="flex gap-3 pt-4">
+              <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={onClose}
-                  className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  onClick={handleNext}
+                  className="bg-sky-500 text-white px-6 py-2 rounded-lg hover:bg-sky-600 transition-colors font-medium"
                 >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                >
-                  Confirm Booking
+                  Next
                 </button>
               </div>
             </div>
-          </form>
+          )}
+
+          {/* Step 2 */}
+          {step === 2 && (
+            <div className="space-y-4">
+              <input
+                type="text"
+                name="contactName"
+                placeholder="Full Name"
+                value={formData.contactName}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              />
+              {errors.contactName && <p className="text-red-500 text-sm">{errors.contactName}</p>}
+
+              <input
+                type="tel"
+                name="contactPhone"
+                placeholder="Phone Number"
+                value={formData.contactPhone}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              />
+              {errors.contactPhone && <p className="text-red-500 text-sm">{errors.contactPhone}</p>}
+
+              <input
+                type="email"
+                name="contactEmail"
+                placeholder="Email Address"
+                value={formData.contactEmail}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              />
+              {errors.contactEmail && <p className="text-red-500 text-sm">{errors.contactEmail}</p>}
+
+              <textarea
+                name="address"
+                placeholder="Service Address"
+                rows="2"
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              />
+              {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
+
+              <textarea
+                name="specialRequirements"
+                placeholder="Special Requirements (Optional)"
+                rows="2"
+                value={formData.specialRequirements}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-400 focus:border-transparent"
+              />
+
+              <div className="flex justify-between">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  className="px-6 py-2 border rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="bg-sky-500 text-white px-6 py-2 rounded-lg hover:bg-sky-600 transition-colors font-medium"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Review & Confirm */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <h3 className="font-semibold text-gray-700 mb-2">Review Booking</h3>
+                <p><strong>Guard:</strong> {guard.name}</p>
+                <p><strong>Start Date:</strong> {formData.startDate}</p>
+                <p><strong>Duration:</strong> {formData.duration} {formData.durationType}</p>
+                <p><strong>Contact:</strong> {formData.contactName}, {formData.contactPhone}</p>
+                <p><strong>Address:</strong> {formData.address}</p>
+                <p><strong>Special Requirements:</strong> {formData.specialRequirements || "-"}</p>
+                <p className="mt-2 font-bold text-sky-600 text-lg">
+                  Total Cost: Rs {calculateCost().toLocaleString()}
+                </p>
+              </div>
+
+              <div className="flex justify-between">
+                <button
+                  type="button"
+                  onClick={handlePrev}
+                  className="px-6 py-2 border rounded-lg hover:bg-gray-100 transition-colors font-medium"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmPayment}
+                  className="bg-sky-500 text-white px-6 py-2 rounded-lg hover:bg-sky-600 transition-colors font-medium flex items-center gap-2"
+                >
+                  <CreditCard className="w-4 h-4" /> Confirm Payment
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

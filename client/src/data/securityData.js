@@ -18,6 +18,9 @@ export const companies = [
     guards: 32,
     description: 'Premium security services for high-profile clients and events.',
     availableGuards: [
+           { id: 1, name: 'John Smith', specialty: 'Corporate', rating: 4.9, image: 'JS', hourlyRate: 35 },
+      { id: 2, name: 'Maria Garcia', specialty: 'Event', rating: 4.8, image: 'MG', hourlyRate: 30 },
+      { id: 4, name: 'Sarah Johnson', specialty: 'Night Patrol', rating: 4.9, image: 'SJ', hourlyRate: 38 },
       { id: 3, name: 'David Chen', specialty: 'Residential', rating: 4.7, image: 'DC', hourlyRate: 32 },
       { id: 6, name: 'Lisa White', specialty: 'Corporate', rating: 4.8, image: 'LW', hourlyRate: 36 },
       { id: 7, name: 'James Wilson', specialty: 'Event', rating: 4.7, image: 'JW', hourlyRate: 33 },
@@ -30,6 +33,9 @@ export const companies = [
     guards: 28,
     description: 'Comprehensive security solutions for businesses and residential properties.',
     availableGuards: [
+           { id: 1, name: 'John Smith', specialty: 'Corporate', rating: 4.9, image: 'JS', hourlyRate: 35 },
+      { id: 2, name: 'Maria Garcia', specialty: 'Event', rating: 4.8, image: 'MG', hourlyRate: 30 },
+      { id: 4, name: 'Sarah Johnson', specialty: 'Night Patrol', rating: 4.9, image: 'SJ', hourlyRate: 38 },
       { id: 5, name: 'Mike Brown', specialty: 'Retail', rating: 4.6, image: 'MB', hourlyRate: 28 },
       { id: 8, name: 'Anna Lee', specialty: 'Hospital', rating: 4.9, image: 'AL', hourlyRate: 40 },
       { id: 9, name: 'Tom Davis', specialty: 'Mall', rating: 4.5, image: 'TD', hourlyRate: 27 },
