@@ -1,26 +1,17 @@
+// App.jsx
+// This is the root of our React app
+// Everything starts from here
 
-
-
-import { BrowserRouter } from 'react-router-dom'
-
-
-// import React, {Suspense} from 'react'
-
-// const Login = React.lazy(() => import('./components/log'));
-// const Register = React.lazy(() => import('./components/reg'));
-
-import { AppRoutes } from './AppRoutes.jsx';
+import React from "react";
+import { BrowserRouter } from "react-router-dom";
+import { AppRoutes } from "./AppRoutes.jsx";
 
 export default function App() {
   return (
-    <>
-
-<BrowserRouter>
+    // BrowserRouter enables page navigation without refresh
+    <BrowserRouter>
+      {/* AppRoutes has all our page routes */}
       <AppRoutes />
-</BrowserRouter>
-
-    </>
+    </BrowserRouter>
   );
 }
-
-
