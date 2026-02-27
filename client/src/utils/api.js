@@ -1,10 +1,14 @@
+
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5432/api";
+
+const BASE_URL = "http://localhost:5000/api";
 
 export const apiRequest = async (method, endpoint, options = {}) => {
   const { data, params, headers } = options;
-  const token = localStorage.getItem("access_token"); 
+
+  // Get token from localStorage
+  const token = localStorage.getItem("access_token");
 
   try {
     const response = await axios({
@@ -18,9 +22,11 @@ export const apiRequest = async (method, endpoint, options = {}) => {
         ...headers,
       },
     });
-    return response; 
+
+    return response;
+
   } catch (error) {
-    console.error(error);
+    console.error("API Error:", error);
     if (error.response && error.response.data) {
       throw new Error(error.response.data.message || "Something went wrong!");
     } else {
