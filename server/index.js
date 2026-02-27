@@ -1,47 +1,46 @@
 // index.js
-// This is the main file that starts our server
-// Everything starts from here
+// Main server file
 
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
+import express  from "express";
+import cors     from "cors";
+import dotenv   from "dotenv";
 import { connection } from "./Database/db.js";
-import { router as authRouter } from "./route/authRoute.js";
 
-// Load .env file variables
+// Routes
+import { router as authRouter }    from "./route/authRoute.js";
+import { router as companyRouter } from "./route/companyRoute.js";
+import { router as guardRouter }   from "./route/guardRoute.js";
+import { router as bookingRouter } from "./route/bookingRoute.js";
+import { router as profileRouter } from "./route/Profileroute.js";
+
+// Models (import so tables auto create)
+import "./model/userModel.js";
+import "./model/companyModel.js";
+import "./model/guardModel.js";
+import "./model/bookingModel.js";
+
 dotenv.config();
 
-// Create express app
-const app = express();
-
-// ── MIDDLEWARE ────────────────────────────────
-// These run on every request before routes
-
-// Allow frontend to talk to backend (different ports)
-app.use(cors());
-
-// Allow server to read JSON data from requests
-app.use(express.json());
-
-// ── TEST ROUTE ────────────────────────────────
-// Visit http://localhost:5000 to check server is running
-app.get("/", (req, res) => {
-  res.send("✅ FindGuard Server is running!");
-});
-
-// ── ROUTES ────────────────────────────────────
-// All auth routes start with /api/auth
-// Example: /api/auth/login, /api/auth/register
-app.use("/api/auth", authRouter);
-
-// ── START SERVER ──────────────────────────────
-// Connect to database first, then start server
+const app  = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to database
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("✅ FindGuard Server Running!");
+});
+
+// All routes
+app.use("/api/auth",      authRouter);
+app.use("/api/companies", companyRouter);
+app.use("/api/guards",    guardRouter);
+app.use("/api/bookings",  bookingRouter);
+app.use("/api/profile",   profileRouter);
+
+// Start after DB connects
 connection().then(() => {
-  // After database connects, start the server
   app.listen(PORT, () => {
-    console.log(`✅ Server is running on http://localhost:${PORT}`);
+    console.log(`✅ Server running on http://localhost:${PORT}`);
   });
 });
