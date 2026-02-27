@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { companies } from '../../data/securityData';
-import CompanyCard from '../../components/CompanyCard';
-import GuardsList from '../../components/GuardsList';
+import { companies } from '../../../data/securityData';
+import CompanyCard from '../../../components/CompanyCard';
+import GuardsList from '../../../components/GuardsList';
 
 export default function CompaniesPage() {
   const [selectedCompany, setSelectedCompany] = useState(null);

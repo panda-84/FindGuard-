@@ -1,5 +1,5 @@
 import React from 'react';
-import securityImage from '../../assets/ads/ad1.png'; // Make sure to have an image at this path
+// import securityImage from '../../../assets/ads/image.png';
 
 export default function HomePage() {
   return (
@@ -7,7 +7,7 @@ export default function HomePage() {
       <main className="max-w-7xl mx-auto px-6 py-12">
 <div className="h-64 rounded-lg mb-8 overflow-hidden">
   <img 
-    src={securityImage}
+    src={""}
     alt="Security Company" 
     className="w-full h-full object-cover"
   />

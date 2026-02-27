@@ -1,56 +1,42 @@
 export const companies = [
   {
     id: 1,
-    name: 'Metro Security Solutions',
-    location: 'New York, NY',
-    guards: 45,
-    description: 'Leading security provider in the metropolitan area with over 15 years of experience.',
+    name: "Alpha Security",
+    location: "Kathmandu",
+    description: "Top rated security company",
+    logo: null,
+    guards: 3,
     availableGuards: [
-      { id: 1, name: 'John Smith', specialty: 'Corporate', rating: 4.9, image: 'JS', hourlyRate: 35 },
-      { id: 2, name: 'Maria Garcia', specialty: 'Event', rating: 4.8, image: 'MG', hourlyRate: 30 },
-      { id: 4, name: 'Sarah Johnson', specialty: 'Night Patrol', rating: 4.9, image: 'SJ', hourlyRate: 38 },
-    ]
+      { id: 1, name: "Marcus Webb",   company: "Alpha Security", specialty: "Armed",   rating: 4.8, hourlyRate: 25, photo: null },
+      { id: 2, name: "Priya Nair",    company: "Alpha Security", specialty: "Armed",   rating: 4.7, hourlyRate: 22, photo: null },
+      { id: 3, name: "Carlos Mendez", company: "Alpha Security", specialty: "Patrol",  rating: 4.5, hourlyRate: 18, photo: null },
+    ],
   },
   {
     id: 2,
-    name: 'Elite Guard Services',
-    location: 'Los Angeles, CA',
-    guards: 32,
-    description: 'Premium security services for high-profile clients and events.',
+    name: "Shield Guards",
+    location: "Pokhara",
+    description: "Professional armed guards",
+    logo: null,
+    guards: 2,
     availableGuards: [
-           { id: 1, name: 'John Smith', specialty: 'Corporate', rating: 4.9, image: 'JS', hourlyRate: 35 },
-      { id: 2, name: 'Maria Garcia', specialty: 'Event', rating: 4.8, image: 'MG', hourlyRate: 30 },
-      { id: 4, name: 'Sarah Johnson', specialty: 'Night Patrol', rating: 4.9, image: 'SJ', hourlyRate: 38 },
-      { id: 3, name: 'David Chen', specialty: 'Residential', rating: 4.7, image: 'DC', hourlyRate: 32 },
-      { id: 6, name: 'Lisa White', specialty: 'Corporate', rating: 4.8, image: 'LW', hourlyRate: 36 },
-      { id: 7, name: 'James Wilson', specialty: 'Event', rating: 4.7, image: 'JW', hourlyRate: 33 },
-    ]
+      { id: 4, name: "Sarah Okonkwo", company: "Shield Guards", specialty: "Unarmed", rating: 4.9, hourlyRate: 20, photo: null },
+      { id: 5, name: "James Tran",    company: "Shield Guards", specialty: "VIP",     rating: 4.6, hourlyRate: 30, photo: null },
+    ],
   },
   {
     id: 3,
-    name: 'SafeWatch Security',
-    location: 'Chicago, IL',
-    guards: 28,
-    description: 'Comprehensive security solutions for businesses and residential properties.',
+    name: "SafeGuard Nepal",
+    location: "Lalitpur",
+    description: "24/7 security services",
+    logo: null,
+    guards: 1,
     availableGuards: [
-           { id: 1, name: 'John Smith', specialty: 'Corporate', rating: 4.9, image: 'JS', hourlyRate: 35 },
-      { id: 2, name: 'Maria Garcia', specialty: 'Event', rating: 4.8, image: 'MG', hourlyRate: 30 },
-      { id: 4, name: 'Sarah Johnson', specialty: 'Night Patrol', rating: 4.9, image: 'SJ', hourlyRate: 38 },
-      { id: 5, name: 'Mike Brown', specialty: 'Retail', rating: 4.6, image: 'MB', hourlyRate: 28 },
-      { id: 8, name: 'Anna Lee', specialty: 'Hospital', rating: 4.9, image: 'AL', hourlyRate: 40 },
-      { id: 9, name: 'Tom Davis', specialty: 'Mall', rating: 4.5, image: 'TD', hourlyRate: 27 },
-    ]
+      { id: 6, name: "Aisha Farouq", company: "SafeGuard Nepal", specialty: "VIP", rating: 4.8, hourlyRate: 28, photo: null },
+    ],
   },
 ];
 
-export const allSecurities = [
-  { id: 1, name: 'John Smith', specialty: 'Corporate', rating: 4.9, image: 'JS', hourlyRate: 35 },
-  { id: 2, name: 'Maria Garcia', specialty: 'Event', rating: 4.8, image: 'MG', hourlyRate: 30 },
-  { id: 3, name: 'David Chen', specialty: 'Residential', rating: 4.7, image: 'DC', hourlyRate: 32 },
-  { id: 4, name: 'Sarah Johnson', specialty: 'Night Patrol', rating: 4.9, image: 'SJ', hourlyRate: 38 },
-  { id: 5, name: 'Mike Brown', specialty: 'Retail', rating: 4.6, image: 'MB', hourlyRate: 28 },
-  { id: 6, name: 'Lisa White', specialty: 'Corporate', rating: 4.8, image: 'LW', hourlyRate: 36 },
-  { id: 7, name: 'James Wilson', specialty: 'Event', rating: 4.7, image: 'JW', hourlyRate: 33 },
-  { id: 8, name: 'Anna Lee', specialty: 'Hospital', rating: 4.9, image: 'AL', hourlyRate: 40 },
-  { id: 9, name: 'Tom Davis', specialty: 'Mall', rating: 4.5, image: 'TD', hourlyRate: 27 },
-];
+export const allSecurities = companies.flatMap(c => c.availableGuards);
+export const securities    = allSecurities;
+export const allCompanies  = companies;

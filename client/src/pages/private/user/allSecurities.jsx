@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { allSecurities } from '../../data/securityData';
-import SecurityCard from '../../components/SecurityCard';
-import BookingModal from '../../components/BookingModal';
+import { allSecurities } from '../../../data/securityData';
+import SecurityCard from '../../../components/SecurityCard';
+import BookingModal from '../../../components/BookingModal';
 
 export default function SecuritiesPage() {
   const [selectedGuard, setSelectedGuard] = useState(null);
