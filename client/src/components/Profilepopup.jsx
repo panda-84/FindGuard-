@@ -1,6 +1,3 @@
-// ProfilePopup.jsx
-// Connected to real API
-
 import React, { useState, useRef, useEffect } from "react";
 import { useApi } from "../hooks/useAPI";
 

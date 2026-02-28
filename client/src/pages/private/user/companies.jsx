@@ -6,6 +6,7 @@ import { useApi } from "../../../hooks/useAPI";
 import CompanyCard  from "../../../components/CompanyCard";
 import GuardsList   from "../../../components/GuardsList";
 import BookingModal from "../../../components/BookingModal";
+import bgImage from "../../../assets/ads/companyAd.png";
 
 export default function CompaniesPage() {
   const { callApi } = useApi();
@@ -53,7 +54,9 @@ export default function CompaniesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-900 to-black">
       <main className="max-w-7xl mx-auto px-6 py-12">
-        <div className="bg-gray-500 h-48 rounded-lg mb-12"></div>
+        <div className="bg-gray-500 h-48 rounded-lg mb-12">
+          <img src={bgImage} alt="Company Header" className="w-full h-full object-cover rounded-lg" />
+        </div>
 
         <h1 className="text-5xl font-bold text-center text-white mb-12">Companies</h1>
 

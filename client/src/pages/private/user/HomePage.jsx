@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";
+import bgImage from "../../../assets/ads/home.png";
 
 export default function HomePage() {
   const { callApi } = useApi();
@@ -56,7 +57,10 @@ export default function HomePage() {
           <p className="text-blue-300 text-lg">Your security management portal</p>
         </div>
 
-        {/* Stats */}
+         <div className="bg-gray-500 h-50 rounded-lg mb-12">
+                  <img src={bgImage} alt="Company Header" className="w-full h-full object-cover rounded-lg" />
+                </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {statCards.map((stat) => (
             <div key={stat.label}

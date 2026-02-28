@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import logo from '../assets/Untitled.png';
-import ProfilePopup from './ProfilePopup';
+import ProfilePopup from './ProfilePopup.jsx';
 
 export default function Header({ currentPage, setCurrentPage }) {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -46,7 +46,7 @@ export default function Header({ currentPage, setCurrentPage }) {
           <div className="ml-auto">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="w-11 h-11 rounded-full bg-blue-700 hover:bg-blue-500
+              className="w-16 h-11 mr-10 rounded-full bg-blue-700 hover:bg-blue-500
                 flex items-center justify-center text-white font-bold text-lg
                 border-2 border-blue-400
                 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]
