@@ -1,38 +1,61 @@
 // ProfilePopup.jsx
-// One edit button top right
-// All fields editable at once
-// Popup in center of screen
+// Connected to real API
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useApi } from "../hooks/useAPI";
 
 export default function ProfilePopup({ onClose }) {
-  const savedName = localStorage.getItem("userName") || "User";
+  const { callApi } = useApi();
 
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving,  setSaving]  = useState(false);
+  const [message, setMessage] = useState("");
+  const [photo,   setPhoto]   = useState(null);
 
-  const [name,  setName]  = useState(savedName);
-  const [phone, setPhone] = useState("9800000000");
-  const [dob,   setDob]   = useState("2000-01-01");
-  const [photo, setPhoto] = useState(null);
+  // Real data from API
+  const [name,  setName]  = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [dob,   setDob]   = useState("");
+  const [role,  setRole]  = useState("");
 
   // Temp values while editing
-  const [tempName,  setTempName]  = useState(savedName);
-  const [tempPhone, setTempPhone] = useState("9800000000");
-  const [tempDob,   setTempDob]   = useState("2000-01-01");
+  const [tempName,  setTempName]  = useState("");
+  const [tempPhone, setTempPhone] = useState("");
+  const [tempDob,   setTempDob]   = useState("");
 
   const fileInputRef = useRef(null);
 
-  const email = "customer@test.com";
-  const role  = "Customer";
+  // ── LOAD PROFILE FROM API ──
+  useEffect(() => { loadProfile(); }, []);
 
-  // Handle photo upload
+  const loadProfile = async () => {
+    setLoading(true);
+    try {
+      const res  = await callApi("GET", "/profile");
+      const user = res?.data?.data;
+      if (user) {
+        setName(user.name   || "");
+        setEmail(user.email || "");
+        setPhone(user.phone || "");
+        setDob(user.dob     || "");
+        setRole(user.role   || "");
+        localStorage.setItem("userName", user.name || "");
+      }
+    } catch (err) {
+      console.error("Load profile error:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handlePhotoUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     setPhoto(URL.createObjectURL(file));
   };
 
-  // Start editing - copy current values to temp
   const handleEdit = () => {
     setTempName(name);
     setTempPhone(phone);
@@ -40,21 +63,33 @@ export default function ProfilePopup({ onClose }) {
     setEditing(true);
   };
 
-  // Save all fields at once
-  const handleSave = () => {
-    setName(tempName);
-    setPhone(tempPhone);
-    setDob(tempDob);
-    localStorage.setItem("userName", tempName);
-    setEditing(false);
+  // ── SAVE TO API ──
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage("");
+    try {
+      const res     = await callApi("PUT", "/profile", {
+        data: { name: tempName, phone: tempPhone, dob: tempDob },
+      });
+      const updated = res?.data?.data;
+      if (updated) {
+        setName(updated.name   || tempName);
+        setPhone(updated.phone || tempPhone);
+        setDob(updated.dob     || tempDob);
+        localStorage.setItem("userName", updated.name || tempName);
+      }
+      setMessage("✅ Profile updated!");
+      setEditing(false);
+      setTimeout(() => setMessage(""), 3000);
+    } catch (err) {
+      setMessage("❌ " + err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  // Cancel editing
-  const handleCancel = () => {
-    setEditing(false);
-  };
+  const handleCancel = () => { setEditing(false); setMessage(""); };
 
-  // Logout
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("role");
@@ -64,175 +99,139 @@ export default function ProfilePopup({ onClose }) {
 
   return (
     <>
-      {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black/60 z-40"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
 
-      {/* Popup - centered on screen */}
       <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div className="w-full max-w-[420px]
-          bg-black/80 backdrop-blur-md rounded-3xl p-6
-          shadow-[0_0_40px_rgba(168,85,248,0.5)]
-          border border-blue-500/30
-          max-h-[90vh] overflow-y-auto"
+        <div
+          className="w-full max-w-[420px] bg-black/80 backdrop-blur-md rounded-3xl p-6
+            shadow-[0_0_40px_rgba(168,85,248,0.5)] border border-blue-500/30
+            max-h-[90vh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
 
-          {/* Title + Edit + Close buttons */}
+          {/* Title + Buttons */}
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-white font-bold text-lg">My Profile</h2>
-
             <div className="flex items-center gap-3">
-              {/* Edit / Save / Cancel button */}
               {editing ? (
                 <>
-                  <button
-                    onClick={handleSave}
+                  <button onClick={handleSave} disabled={saving}
                     className="text-sm font-bold px-4 py-1.5 rounded-lg
-                      bg-blue-700 hover:bg-blue-500 text-white transition
-                      hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
-                  >
-                    Save
+                      bg-blue-700 hover:bg-blue-500 text-white transition disabled:opacity-50">
+                    {saving ? "Saving..." : "Save"}
                   </button>
-                  <button
-                    onClick={handleCancel}
+                  <button onClick={handleCancel}
                     className="text-sm font-bold px-4 py-1.5 rounded-lg
-                      bg-gray-600 hover:bg-gray-500 text-white transition"
-                  >
+                      bg-gray-600 hover:bg-gray-500 text-white transition">
                     Cancel
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={handleEdit}
+                <button onClick={handleEdit}
                   className="text-sm font-bold px-4 py-1.5 rounded-lg
                     bg-blue-700 hover:bg-blue-500 text-white transition
-                    hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
-                >
+                    hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]">
                   ✏️ Edit
                 </button>
               )}
-
-              {/* Close button */}
-              <button
-                onClick={onClose}
-                className="text-blue-300 hover:text-white text-xl transition"
-              >
-                ✕
-              </button>
+              <button onClick={onClose} className="text-blue-300 hover:text-white text-xl transition">✕</button>
             </div>
           </div>
 
-          {/* ── PHOTO + NAME ── */}
-          <div className="flex flex-col items-center mb-6">
+          {/* Message */}
+          {message && (
+            <div className="mb-4 bg-blue-500/20 border border-blue-400/30
+              rounded-xl p-2 text-center text-white text-sm">
+              {message}
+            </div>
+          )}
 
-            {/* Photo */}
-            <div
-              className="w-24 h-24 rounded-full border-2 border-blue-400
-                shadow-[0_0_20px_rgba(168,85,247,0.5)]
-                overflow-hidden cursor-pointer relative
-                hover:shadow-[0_0_30px_rgba(168,85,247,0.8)]
-                transition duration-300"
-              onClick={() => fileInputRef.current.click()}
-            >
-              {photo ? (
-                <img src={photo} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-blue-700 flex items-center justify-center">
-                  <span className="text-white font-bold text-3xl">
-                    {name.charAt(0).toUpperCase()}
-                  </span>
+          {/* Loading */}
+          {loading ? (
+            <div className="text-center py-10">
+              <p className="text-blue-300 animate-pulse">Loading profile...</p>
+            </div>
+          ) : (
+            <>
+              {/* PHOTO + NAME */}
+              <div className="flex flex-col items-center mb-6">
+                <div
+                  className="w-24 h-24 rounded-full border-2 border-blue-400
+                    shadow-[0_0_20px_rgba(168,85,247,0.5)] overflow-hidden
+                    cursor-pointer relative hover:shadow-[0_0_30px_rgba(168,85,247,0.8)] transition"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  {photo ? (
+                    <img src={photo} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-blue-700 flex items-center justify-center">
+                      <span className="text-white font-bold text-3xl">
+                        {name.charAt(0).toUpperCase() || "?"}
+                      </span>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition">
+                    <span className="text-white text-2xl">📷</span>
+                  </div>
                 </div>
-              )}
 
-              {/* Camera hover */}
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition">
-                <span className="text-white text-2xl">📷</span>
+                <input type="file" accept="image/*" ref={fileInputRef}
+                  onChange={handlePhotoUpload} className="hidden" />
+
+                <p className="text-white font-bold text-lg mt-3">{name || "—"}</p>
+                <p className="text-blue-300 text-xs capitalize">{role}</p>
+                <p className="text-blue-400 text-xs mt-1">Click photo to change</p>
               </div>
-            </div>
 
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={handlePhotoUpload}
-              className="hidden"
-            />
+              {/* FIELDS */}
+              <div className="space-y-3">
 
-            <p className="text-white font-bold text-lg mt-3">{name}</p>
-            <p className="text-blue-300 text-xs">{role}</p>
-            <p className="text-blue-400 text-xs mt-1">Click photo to change</p>
-          </div>
+                <div className="bg-blue-500/15 rounded-xl px-4 py-3">
+                  <p className="text-blue-300 text-xs font-bold mb-1">Full Name</p>
+                  {editing ? (
+                    <input value={tempName} onChange={(e) => setTempName(e.target.value)}
+                      className="w-full bg-transparent text-white outline-none border-b border-blue-400 pb-1" />
+                  ) : (
+                    <p className="text-white font-semibold">{name || "—"}</p>
+                  )}
+                </div>
 
-          {/* ── FIELDS ── */}
-          <div className="space-y-3">
+                <div className="bg-blue-500/10 rounded-xl px-4 py-3 opacity-70">
+                  <p className="text-blue-300 text-xs font-bold mb-1">Email (cannot edit)</p>
+                  <p className="text-white font-semibold">{email || "—"}</p>
+                </div>
 
-            {/* Name */}
-            <div className="bg-blue-500/15 rounded-xl px-4 py-3">
-              <p className="text-blue-300 text-xs font-bold mb-1">Full Name</p>
-              {editing ? (
-                <input
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                  className="w-full bg-transparent text-white outline-none
-                    border-b border-blue-400 pb-1"
-                />
-              ) : (
-                <p className="text-white font-semibold">{name}</p>
-              )}
-            </div>
+                <div className="bg-blue-500/15 rounded-xl px-4 py-3">
+                  <p className="text-blue-300 text-xs font-bold mb-1">Phone</p>
+                  {editing ? (
+                    <input value={tempPhone} onChange={(e) => setTempPhone(e.target.value)}
+                      className="w-full bg-transparent text-white outline-none border-b border-blue-400 pb-1" />
+                  ) : (
+                    <p className="text-white font-semibold">{phone || "—"}</p>
+                  )}
+                </div>
 
-            {/* Email - never editable */}
-            <div className="bg-blue-500/10 rounded-xl px-4 py-3 opacity-70">
-              <p className="text-blue-300 text-xs font-bold mb-1">Email (cannot edit)</p>
-              <p className="text-white font-semibold">{email}</p>
-            </div>
+                <div className="bg-blue-500/15 rounded-xl px-4 py-3">
+                  <p className="text-blue-300 text-xs font-bold mb-1">Date of Birth</p>
+                  {editing ? (
+                    <input type="date" value={tempDob} onChange={(e) => setTempDob(e.target.value)}
+                      className="w-full bg-transparent text-white outline-none border-b border-blue-400 pb-1" />
+                  ) : (
+                    <p className="text-white font-semibold">{dob || "—"}</p>
+                  )}
+                </div>
 
-            {/* Phone */}
-            <div className="bg-blue-500/15 rounded-xl px-4 py-3">
-              <p className="text-blue-300 text-xs font-bold mb-1">Phone</p>
-              {editing ? (
-                <input
-                  value={tempPhone}
-                  onChange={(e) => setTempPhone(e.target.value)}
-                  className="w-full bg-transparent text-white outline-none
-                    border-b border-blue-400 pb-1"
-                />
-              ) : (
-                <p className="text-white font-semibold">{phone}</p>
-              )}
-            </div>
+              </div>
 
-            {/* Date of Birth */}
-            <div className="bg-blue-500/15 rounded-xl px-4 py-3">
-              <p className="text-blue-300 text-xs font-bold mb-1">Date of Birth</p>
-              {editing ? (
-                <input
-                  type="date"
-                  value={tempDob}
-                  onChange={(e) => setTempDob(e.target.value)}
-                  className="w-full bg-transparent text-white outline-none
-                    border-b border-blue-400 pb-1"
-                />
-              ) : (
-                <p className="text-white font-semibold">{dob}</p>
-              )}
-            </div>
-
-          </div>
-
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="w-full mt-5 bg-red-500/20 hover:bg-red-500/40
-              text-red-400 border border-red-400/30
-              font-bold py-2 rounded-3xl transition duration-300
-              hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]"
-          >
-            Logout
-          </button>
+              {/* Logout */}
+              <button onClick={handleLogout}
+                className="w-full mt-5 bg-red-500/20 hover:bg-red-500/40
+                  text-red-400 border border-red-400/30 font-bold py-2 rounded-3xl
+                  transition hover:shadow-[0_0_15px_rgba(239,68,68,0.4)]">
+                Logout
+              </button>
+            </>
+          )}
 
         </div>
       </div>
