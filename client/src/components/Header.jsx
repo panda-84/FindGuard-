@@ -1,5 +1,4 @@
-// Header.jsx
-// Uses separate ProfilePopup component
+// components/Header.jsx
 
 import React, { useState } from 'react';
 import logo from '../assets/Untitled.png';
@@ -7,6 +6,14 @@ import ProfilePopup from './ProfilePopup';
 
 export default function Header({ currentPage, setCurrentPage }) {
   const [profileOpen, setProfileOpen] = useState(false);
+  const name = localStorage.getItem("userName") || "User";
+
+  const navItems = [
+    { id: "home",       label: "Home"        },
+    { id: "companies",  label: "Companies"   },
+    { id: "securities", label: "Security"    },
+    { id: "bookings",   label: "My Bookings" },
+  ];
 
   return (
     <>
@@ -18,40 +25,21 @@ export default function Header({ currentPage, setCurrentPage }) {
             <img src={logo} alt="Logo" className="h-[200px] w-[150px]" />
           </div>
 
-          {/* Nav Buttons */}
-          <nav className="space-x-9 ml-[350px]">
-            <button
-              onClick={() => setCurrentPage('home')}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                currentPage === 'home'
-                  ? 'bg-white text-gray-800'
-                  : 'bg-blue-300 text-white hover:bg-blue-200'
-              }`}
-            >
-              Home
-            </button>
-
-            <button
-              onClick={() => setCurrentPage('companies')}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                currentPage === 'companies'
-                  ? 'bg-white text-gray-800'
-                  : 'bg-blue-300 text-white hover:bg-blue-200'
-              }`}
-            >
-              Companies
-            </button>
-
-            <button
-              onClick={() => setCurrentPage('securities')}
-              className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                currentPage === 'securities'
-                  ? 'bg-white text-gray-800'
-                  : 'bg-blue-300 text-white hover:bg-blue-200'
-              }`}
-            >
-              Security
-            </button>
+          {/* Nav */}
+          <nav className="space-x-4 ml-[200px] flex items-center">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setCurrentPage(item.id)}
+                className={`px-5 py-2 rounded-lg font-medium transition-colors ${
+                  currentPage === item.id
+                    ? "bg-white text-gray-800"
+                    : "bg-blue-300 text-white hover:bg-blue-200"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
 
           {/* Profile Button */}
@@ -64,14 +52,13 @@ export default function Header({ currentPage, setCurrentPage }) {
                 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]
                 transition duration-300"
             >
-              👤
+              {name.charAt(0).toUpperCase()}
             </button>
           </div>
 
         </div>
       </header>
 
-      {/* Profile Popup */}
       {profileOpen && (
         <ProfilePopup onClose={() => setProfileOpen(false)} />
       )}
