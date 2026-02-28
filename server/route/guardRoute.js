@@ -8,13 +8,17 @@ import {
   updateGuard,
   updateGuardStatus,
   deleteGuard,
+  getAllGuardsAdmin,
 } from "../controller/guardController.js";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import { roleMiddleware } from "../middleware/roleMiddleware.js";
 
 export const router = express.Router();
 
-// ── PUBLIC (all logged in users can see available guards) ──
+// ── ADMIN ONLY (must be BEFORE /:id routes) ───
+router.get("/all", authMiddleware, roleMiddleware("admin"), getAllGuardsAdmin);
+
+// ── ALL LOGGED IN USERS ───────────────────────
 router.get("/", authMiddleware, getAllGuards);
 
 // ── COMPANY ONLY ──────────────────────────────

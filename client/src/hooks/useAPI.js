@@ -1,17 +1,18 @@
+// hooks/useAPI.js
+
 import { useState } from "react";
 import { apiRequest } from "../utils/api";
 
 export const useApi = () => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error,   setError]   = useState("");
 
-  const callApi = async (method, endpoint, data = null) => {
-    console.log(data);
-
+  const callApi = async (method, endpoint, options = {}) => {
     setLoading(true);
     setError("");
     try {
-      const res = await apiRequest(method, endpoint, data);
+      // Always pass options as object, never null
+      const res = await apiRequest(method, endpoint, options || {});
       setLoading(false);
       return res;
     } catch (err) {

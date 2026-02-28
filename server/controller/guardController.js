@@ -1,38 +1,56 @@
-// guardController.js
-// All logic for guard operations
+// controller/guardController.js
 
-import { Guards } from "../model/guardModel.js";
+import { Guards }    from "../model/guardModel.js";
 import { Companies } from "../model/companyModel.js";
 
-// ── GET MY GUARDS (company sees their guards) ──
-export const getMyGuards = async (req, res) => {
+// ── ADD GUARD ───────────────────────────────────
+export const addGuard = async (req, res) => {
   try {
-    // Find company first
-    const company = await Companies.findOne({
-      where: { userId: req.user.id },
+    const { name, badge, phone, experience, shift, zone, price } = req.body;
+
+    if (!name || !price) {
+      return res.status(400).json({ message: "Name and price are required" });
+    }
+
+    const company = await Companies.findOne({ where: { userId: req.user.id } });
+    if (!company) {
+      return res.status(404).json({ message: "Company profile not found" });
+    }
+
+    const guard = await Guards.create({
+      companyId: company.id,
+      name, badge, phone, experience, shift, zone, price,
     });
 
+    res.status(201).json({ message: "Guard added!", data: guard });
+
+  } catch (err) {
+    console.error("Add guard error:", err);
+    res.status(500).json({ message: "Failed to add guard" });
+  }
+};
+
+// ── GET MY GUARDS (company) ─────────────────────
+export const getMyGuards = async (req, res) => {
+  try {
+    const company = await Companies.findOne({ where: { userId: req.user.id } });
     if (!company) {
       return res.status(404).json({ message: "Company not found" });
     }
 
-    // Get all guards for this company
-    const guards = await Guards.findAll({
-      where: { companyId: company.id },
-    });
-
+    const guards = await Guards.findAll({ where: { companyId: company.id } });
     res.status(200).json({ data: guards });
+
   } catch (err) {
+    console.error("Get my guards error:", err);
     res.status(500).json({ message: "Failed to get guards" });
   }
 };
 
-// ── GET ALL GUARDS (customers see available guards) ──
+// ── GET ALL AVAILABLE GUARDS (customers) ────────
 export const getAllGuards = async (req, res) => {
   try {
     const { companyId } = req.query;
-
-    // If companyId given, filter by company
     const where = { status: "available" };
     if (companyId) where.companyId = companyId;
 
@@ -42,56 +60,40 @@ export const getAllGuards = async (req, res) => {
     });
 
     res.status(200).json({ data: guards });
+
   } catch (err) {
+    console.error("Get guards error:", err);
     res.status(500).json({ message: "Failed to get guards" });
   }
 };
 
-// ── ADD GUARD (company adds a guard) ──────────
-export const addGuard = async (req, res) => {
+// ── GET ALL GUARDS (admin) ──────────────────────
+export const getAllGuardsAdmin = async (req, res) => {
   try {
-    const { name, badge, phone, experience, shift, zone, price, photo } = req.body;
-
-    // Get company
-    const company = await Companies.findOne({
-      where: { userId: req.user.id },
+    const guards = await Guards.findAll({
+      include: [{ model: Companies, attributes: ["name", "location"] }],
+      order: [["createdAt", "DESC"]],
     });
 
-    if (!company) {
-      return res.status(404).json({ message: "Company not found" });
-    }
+    res.status(200).json({ data: guards });
 
-    // Create guard
-    const guard = await Guards.create({
-      companyId: company.id,
-      name,
-      badge,
-      phone,
-      experience,
-      shift,
-      zone,
-      price,
-      photo,
-      status: "available",
-    });
-
-    res.status(201).json({ message: "Guard added successfully", data: guard });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to add guard" });
+    console.error("Get all guards admin error:", err);
+    res.status(500).json({ message: "Failed to get guards" });
   }
 };
 
-// ── UPDATE GUARD ───────────────────────────────
+// ── UPDATE GUARD ────────────────────────────────
 export const updateGuard = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, badge, phone, experience, shift, zone, price, photo } = req.body;
+    const { name, badge, phone, experience, shift, zone, price } = req.body;
 
-    const guard = await Guards.findByPk(id);
+    const company = await Companies.findOne({ where: { userId: req.user.id } });
+    const guard   = await Guards.findOne({ where: { id, companyId: company.id } });
+
     if (!guard) return res.status(404).json({ message: "Guard not found" });
 
-    // Update fields
     if (name)       guard.name       = name;
     if (badge)      guard.badge      = badge;
     if (phone)      guard.phone      = phone;
@@ -99,46 +101,52 @@ export const updateGuard = async (req, res) => {
     if (shift)      guard.shift      = shift;
     if (zone)       guard.zone       = zone;
     if (price)      guard.price      = price;
-    if (photo)      guard.photo      = photo;
 
     await guard.save();
+    res.status(200).json({ message: "Guard updated!", data: guard });
 
-    res.status(200).json({ message: "Guard updated", data: guard });
   } catch (err) {
+    console.error("Update guard error:", err);
     res.status(500).json({ message: "Failed to update guard" });
   }
 };
 
-// ── UPDATE GUARD STATUS ────────────────────────
+// ── UPDATE GUARD STATUS ─────────────────────────
 export const updateGuardStatus = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id }     = req.params;
     const { status } = req.body;
 
-    const guard = await Guards.findByPk(id);
+    const company = await Companies.findOne({ where: { userId: req.user.id } });
+    const guard   = await Guards.findOne({ where: { id, companyId: company.id } });
+
     if (!guard) return res.status(404).json({ message: "Guard not found" });
 
     guard.status = status;
     await guard.save();
+    res.status(200).json({ message: `Guard ${status}!`, data: guard });
 
-    res.status(200).json({ message: "Guard status updated", data: guard });
   } catch (err) {
+    console.error("Update status error:", err);
     res.status(500).json({ message: "Failed to update status" });
   }
 };
 
-// ── DELETE GUARD ───────────────────────────────
+// ── DELETE GUARD ────────────────────────────────
 export const deleteGuard = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const guard = await Guards.findByPk(id);
+    const company = await Companies.findOne({ where: { userId: req.user.id } });
+    const guard   = await Guards.findOne({ where: { id, companyId: company.id } });
+
     if (!guard) return res.status(404).json({ message: "Guard not found" });
 
     await guard.destroy();
+    res.status(200).json({ message: "Guard deleted!" });
 
-    res.status(200).json({ message: "Guard deleted" });
   } catch (err) {
+    console.error("Delete guard error:", err);
     res.status(500).json({ message: "Failed to delete guard" });
   }
 };
