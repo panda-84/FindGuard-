@@ -3,11 +3,8 @@
 import React from "react";
 
 export default function SecurityCard({ security, onClick }) {
-  // company can be object {name, location} or string
   const companyName = security.company?.name || security.company || "";
-
-  // price can be hourlyRate (mock) or price (API)
-  const rate = security.hourlyRate || security.price || 0;
+  const price       = Number(security.hourlyRate || security.price || 0);
 
   return (
     <div
@@ -17,7 +14,8 @@ export default function SecurityCard({ security, onClick }) {
       onClick={onClick}
     >
       {/* Photo / Avatar */}
-      <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white shadow-md mb-4 bg-blue-500 flex items-center justify-center">
+      <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-white
+        shadow-md mb-4 bg-blue-500 flex items-center justify-center">
         {security.photo ? (
           <img src={security.photo} alt={security.name} className="w-full h-full object-cover" />
         ) : (
@@ -27,25 +25,21 @@ export default function SecurityCard({ security, onClick }) {
         )}
       </div>
 
-      {/* Name */}
       <h3 className="text-xl font-semibold text-white mb-1">{security.name}</h3>
-
-      {/* Company */}
       <p className="text-blue-200 text-sm mb-2">{companyName}</p>
-
-      {/* Specialty / Shift */}
       <p className="text-blue-300 text-sm mb-2">
         {security.specialty || security.shift || "Security"}
       </p>
 
-      {/* Rating */}
       <div className="flex items-center mb-2">
         <span className="text-yellow-400 mr-1">★</span>
         <span className="text-white font-medium">{security.rating || "5.0"}</span>
       </div>
 
-      {/* Rate */}
-      <p className="text-green-300 font-semibold">${rate}/hr</p>
+      {/* NPR price */}
+      <p className="text-green-300 font-semibold">
+        Rs {price.toLocaleString()}/hr
+      </p>
     </div>
   );
 }

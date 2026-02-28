@@ -1,12 +1,12 @@
 // bookingController.js
-// All logic for booking operations
 
-import { Bookings } from "../model/bookingModel.js";
-import { Guards } from "../model/guardModel.js";
+import { Op }        from "sequelize";
+import { Bookings }  from "../model/bookingModel.js";
+import { Guards }    from "../model/guardModel.js";
 import { Companies } from "../model/companyModel.js";
-import { Users } from "../model/userModel.js";
+import { Users }     from "../model/userModel.js";
 
-// ── CREATE BOOKING (customer books a guard) ────
+// ── CREATE BOOKING ─────────────────────────────
 export const createBooking = async (req, res) => {
   try {
     const {
@@ -15,22 +15,26 @@ export const createBooking = async (req, res) => {
       address, specialRequirements,
     } = req.body;
 
-    // Get guard to find company and calculate cost
     const guard = await Guards.findByPk(guardId);
     if (!guard) return res.status(404).json({ message: "Guard not found" });
 
-    // Calculate total cost
-    // price is in USD, convert to NPR (1 USD = 140 NPR)
-    let hours = duration;
-    if (durationType === "days")   hours = duration * 8;
-    if (durationType === "months") hours = duration * 8 * 30;
+    // Check guard is available
+    if (guard.status !== "available") {
+      return res.status(400).json({ message: "This guard is not available for booking" });
+    }
 
-    const totalCost = hours * guard.price * 140;
+    // Calculate cost in NPR
+    const rawPrice  = parseFloat(guard.price || 0);
+    const rateNPR   = rawPrice < 100 ? Math.round(rawPrice * 133) : Math.round(rawPrice);
+    let totalHours  = duration;
+    if (durationType === "days")   totalHours = duration * 8;
+    if (durationType === "months") totalHours = duration * 8 * 30;
+    const totalCost = totalHours * rateNPR;
 
     const booking = await Bookings.create({
       customerId: req.user.id,
       guardId,
-      companyId: guard.companyId,
+      companyId:  guard.companyId,
       startDate,
       duration,
       durationType,
@@ -43,9 +47,9 @@ export const createBooking = async (req, res) => {
       status: "pending",
     });
 
-    res.status(201).json({ message: "Booking created", data: booking });
+    res.status(201).json({ message: "Booking created!", data: booking });
   } catch (err) {
-    console.error(err);
+    console.error("Create booking error:", err);
     res.status(500).json({ message: "Failed to create booking" });
   }
 };
@@ -59,21 +63,18 @@ export const getMyBookings = async (req, res) => {
         { model: Guards,    as: "guard",   attributes: ["name", "photo", "price"] },
         { model: Companies, as: "company", attributes: ["name"] },
       ],
+      order: [["createdAt", "DESC"]],
     });
-
     res.status(200).json({ data: bookings });
   } catch (err) {
     res.status(500).json({ message: "Failed to get bookings" });
   }
 };
 
-// ── GET COMPANY BOOKINGS (company sees their bookings) ──
+// ── GET COMPANY BOOKINGS ───────────────────────
 export const getCompanyBookings = async (req, res) => {
   try {
-    const company = await Companies.findOne({
-      where: { userId: req.user.id },
-    });
-
+    const company = await Companies.findOne({ where: { userId: req.user.id } });
     if (!company) return res.status(404).json({ message: "Company not found" });
 
     const bookings = await Bookings.findAll({
@@ -82,8 +83,8 @@ export const getCompanyBookings = async (req, res) => {
         { model: Guards, as: "guard",    attributes: ["name", "photo"] },
         { model: Users,  as: "customer", attributes: ["name", "email", "phone"] },
       ],
+      order: [["createdAt", "DESC"]],
     });
-
     res.status(200).json({ data: bookings });
   } catch (err) {
     res.status(500).json({ message: "Failed to get bookings" });
@@ -93,22 +94,48 @@ export const getCompanyBookings = async (req, res) => {
 // ── UPDATE BOOKING STATUS (company confirms/cancels) ──
 export const updateBookingStatus = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id }     = req.params;
     const { status } = req.body;
 
     const booking = await Bookings.findByPk(id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    booking.status = status;
+    const prevStatus  = booking.status;
+    booking.status    = status;
     await booking.save();
 
-    res.status(200).json({ message: `Booking ${status}`, data: booking });
+    // ── UPDATE GUARD STATUS ──
+    const guard = await Guards.findByPk(booking.guardId);
+    if (guard) {
+      if (status === "confirmed") {
+        // Guard is now on duty
+        guard.status = "on-duty";
+        await guard.save();
+      } else if (status === "cancelled" && prevStatus === "confirmed") {
+        // Booking was confirmed but now cancelled → guard is free again
+        // Check if guard has any other confirmed bookings
+        const otherConfirmed = await Bookings.count({
+          where: {
+            guardId: guard.id,
+            status:  "confirmed",
+            id:      { [Op.ne]: id },
+          },
+        });
+        if (otherConfirmed === 0) {
+          guard.status = "available";
+          await guard.save();
+        }
+      }
+    }
+
+    res.status(200).json({ message: `Booking ${status}!`, data: booking });
   } catch (err) {
+    console.error("Update booking error:", err);
     res.status(500).json({ message: "Failed to update booking" });
   }
 };
 
-// ── CANCEL BOOKING (customer cancels pending) ──
+// ── CANCEL BOOKING (customer) ──────────────────
 export const cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -116,7 +143,6 @@ export const cancelBooking = async (req, res) => {
     const booking = await Bookings.findByPk(id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Only pending bookings can be cancelled
     if (booking.status !== "pending") {
       return res.status(400).json({ message: "Only pending bookings can be cancelled" });
     }
@@ -124,7 +150,10 @@ export const cancelBooking = async (req, res) => {
     booking.status = "cancelled";
     await booking.save();
 
-    res.status(200).json({ message: "Booking cancelled" });
+    // Guard was only pending so no need to change guard status
+    // Guard status only changes on confirmed → cancelled
+
+    res.status(200).json({ message: "Booking cancelled!" });
   } catch (err) {
     res.status(500).json({ message: "Failed to cancel booking" });
   }
@@ -139,8 +168,8 @@ export const getAllBookings = async (req, res) => {
         { model: Companies, as: "company",  attributes: ["name"] },
         { model: Users,     as: "customer", attributes: ["name", "email"] },
       ],
+      order: [["createdAt", "DESC"]],
     });
-
     res.status(200).json({ data: bookings });
   } catch (err) {
     res.status(500).json({ message: "Failed to get bookings" });
