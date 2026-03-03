@@ -52,9 +52,20 @@ export default function BookingModal({ guard, onClose, companyName }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    if (["duration", "hoursPerDay", "contactPhone"].includes(name) && !/^\d*$/.test(value)) return;
+    if (["duration", "hoursPerDay"].includes(name) && !/^\d*$/.test(value)) return;
+    if (name === "contactPhone" && !/^\d*$/.test(value)) return;
+    if (name === "contactPhone" && value.length > 10) return;
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: "" });
+  };
+
+  const handlePhoneKey = (e) => {
+    if (
+      !/[0-9]/.test(e.key) &&
+      !["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight"].includes(e.key)
+    ) {
+      e.preventDefault();
+    }
   };
 
   const { totalHours, totalNPR, rateNPR } = calculateCost(
@@ -71,7 +82,9 @@ export default function BookingModal({ guard, onClose, companyName }) {
     if (!formData.duration)     e.duration     = "Duration is required";
     if (!formData.contactName)  e.contactName  = "Name is required";
     if (!formData.contactPhone) e.contactPhone = "Phone is required";
+    else if (!/^[0-9]{10}$/.test(formData.contactPhone)) e.contactPhone = "Phone must be exactly 10 digits";
     if (!formData.contactEmail) e.contactEmail = "Email is required";
+    else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.contactEmail)) e.contactEmail = "Enter a valid email (e.g. name@gmail.com)";
     if (!formData.address)      e.address      = "Address is required";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -280,16 +293,31 @@ export default function BookingModal({ guard, onClose, companyName }) {
                   {errors.contactName && <p className={err}>{errors.contactName}</p>}
                 </div>
                 <div>
-                  <label className={lbl}>Phone *</label>
-                  <input type="tel" name="contactPhone" placeholder="98XXXXXXXX"
-                    value={formData.contactPhone} onChange={handleChange} className={inp} />
-                  {errors.contactPhone && <p className={err}>{errors.contactPhone}</p>}
+                  <label className={lbl}>Phone * <span className="text-gray-400 font-normal text-xs">(10 digits)</span></label>
+                  <input
+                    type="tel"
+                    name="contactPhone"
+                    placeholder="98XXXXXXXX"
+                    value={formData.contactPhone}
+                    onChange={handleChange}
+                    onKeyDown={handlePhoneKey}
+                    maxLength={10}
+                    className={inp}
+                  />
+                  <div className="flex justify-between mt-1">
+                    {errors.contactPhone
+                      ? <p className={err}>{errors.contactPhone}</p>
+                      : <span />
+                    }
+                    <p className="text-gray-400 text-xs ml-auto">{formData.contactPhone.length}/10</p>
+                  </div>
                 </div>
               </div>
 
               <div>
-                <label className={lbl}>Email *</label>
+                <label className={lbl}>Email * <span className="text-gray-400 font-normal text-xs">(name@example.com)</span></label>
                 <input type="email" name="contactEmail" placeholder="your@email.com"
+                  maxLength={50}
                   value={formData.contactEmail} onChange={handleChange} className={inp} />
                 {errors.contactEmail && <p className={err}>{errors.contactEmail}</p>}
               </div>

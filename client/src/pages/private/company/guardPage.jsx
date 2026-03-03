@@ -1,5 +1,3 @@
-// guardPage.jsx - Price in NPR (Rs)
-
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";
 
@@ -10,6 +8,7 @@ export default function GuardPage() {
   const [showForm,  setShowForm]  = useState(false);
   const [editGuard, setEditGuard] = useState(null);
   const [message,   setMessage]   = useState("");
+  const [errors,    setErrors]    = useState({});
 
   const [form, setForm] = useState({
     name: "", badge: "", phone: "", experience: "",
@@ -22,14 +21,25 @@ export default function GuardPage() {
     try {
       const res = await callApi("GET", "/guards/mine");
       setGuards(res?.data?.data || []);
-    } catch (err) { console.error(err); }
+    } catch (err) {}
     finally { setLoading(false); }
   };
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" });
+  };
+
+  // Block non-numeric keys on phone field
+  const handlePhoneKey = (e) => {
+    if (!/[0-9]/.test(e.key) && !["Backspace","Delete","Tab","ArrowLeft","ArrowRight"].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
 
   const handleAdd = () => {
     setForm({ name: "", badge: "", phone: "", experience: "", shift: "Day", zone: "", price: "" });
+    setErrors({});
     setEditGuard(null);
     setShowForm(true);
   };
@@ -40,12 +50,23 @@ export default function GuardPage() {
       phone: guard.phone || "", experience: guard.experience || "",
       shift: guard.shift || "Day", zone: guard.zone || "", price: guard.price || "",
     });
+    setErrors({});
     setEditGuard(guard);
     setShowForm(true);
   };
 
+  const validate = () => {
+    const e = {};
+    if (!form.name.trim()) e.name  = "Name is required";
+    if (!form.price)       e.price = "Price is required";
+    if (form.phone && !/^[0-9]{10}$/.test(form.phone))
+      e.phone = "Phone must be exactly 10 digits";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
   const handleSubmit = async () => {
-    if (!form.name || !form.price) { setMessage("Name and price are required!"); return; }
+    if (!validate()) return;
     try {
       if (editGuard) {
         await callApi("PUT", `/guards/${editGuard.id}`, { data: form });
@@ -73,7 +94,7 @@ export default function GuardPage() {
   const handleStatus = async (id, status) => {
     try {
       await callApi("PATCH", `/guards/${id}/status`, { data: { status } });
-      setMessage(`Guard status updated!`);
+      setMessage("Guard status updated!");
       loadGuards();
       setTimeout(() => setMessage(""), 3000);
     } catch (err) { setMessage("❌ " + err.message); }
@@ -101,30 +122,57 @@ export default function GuardPage() {
         </div>
       )}
 
-      {/* Form */}
       {showForm && (
         <div className="bg-black/20 backdrop-blur-md rounded-3xl p-6
           shadow-[0_0_30px_rgba(168,85,248,0.25)] border border-blue-500/20">
           <h2 className="text-lg font-bold text-white mb-4">
             {editGuard ? "Edit Guard" : "Add New Guard"}
           </h2>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
             <div>
               <label className="text-blue-300 text-xs font-bold mb-1 block">Name *</label>
-              <input name="name" value={form.name} onChange={handleChange} placeholder="Guard full name" className={inputClass} />
+              <input name="name" value={form.name} onChange={handleChange}
+                placeholder="Guard full name" className={inputClass} />
+              {errors.name && <p className="text-red-400 text-xs mt-1">⚠ {errors.name}</p>}
             </div>
+
             <div>
               <label className="text-blue-300 text-xs font-bold mb-1 block">Badge Number</label>
-              <input name="badge" value={form.badge} onChange={handleChange} placeholder="e.g. GRD-001" className={inputClass} />
+              <input name="badge" value={form.badge} onChange={handleChange}
+                placeholder="e.g. GRD-001" className={inputClass} />
             </div>
+
             <div>
-              <label className="text-blue-300 text-xs font-bold mb-1 block">Phone</label>
-              <input name="phone" value={form.phone} onChange={handleChange} placeholder="98XXXXXXXX" className={inputClass} />
+              <label className="text-blue-300 text-xs font-bold mb-1 block">
+                Phone <span className="text-blue-400/50 font-normal">(10 digits)</span>
+              </label>
+              <input
+                name="phone"
+                type="tel"
+                value={form.phone}
+                onChange={handleChange}
+                onKeyDown={handlePhoneKey}
+                maxLength={10}
+                placeholder="98XXXXXXXX"
+                className={inputClass}
+              />
+              <div className="flex justify-between mt-1">
+                {errors.phone
+                  ? <p className="text-red-400 text-xs">⚠ {errors.phone}</p>
+                  : <span/>
+                }
+                <p className="text-blue-400/50 text-xs ml-auto">{form.phone.length}/10</p>
+              </div>
             </div>
+
             <div>
               <label className="text-blue-300 text-xs font-bold mb-1 block">Experience</label>
-              <input name="experience" value={form.experience} onChange={handleChange} placeholder="e.g. 5 years" className={inputClass} />
+              <input name="experience" value={form.experience} onChange={handleChange}
+                placeholder="e.g. 5 years" className={inputClass} />
             </div>
+
             <div>
               <label className="text-blue-300 text-xs font-bold mb-1 block">Shift</label>
               <select name="shift" value={form.shift} onChange={handleChange} className={inputClass}>
@@ -133,16 +181,20 @@ export default function GuardPage() {
                 <option value="Flexible">Flexible</option>
               </select>
             </div>
+
             <div>
               <label className="text-blue-300 text-xs font-bold mb-1 block">Zone / Area</label>
-              <input name="zone" value={form.zone} onChange={handleChange} placeholder="e.g. Kathmandu" className={inputClass} />
+              <input name="zone" value={form.zone} onChange={handleChange}
+                placeholder="e.g. Kathmandu" className={inputClass} />
             </div>
+
             <div className="md:col-span-2">
               <label className="text-blue-300 text-xs font-bold mb-1 block">
                 💰 Hourly Rate (Rs/hr) *
               </label>
               <input name="price" type="number" value={form.price} onChange={handleChange}
                 placeholder="e.g. 800" className={inputClass} />
+              {errors.price && <p className="text-red-400 text-xs mt-1">⚠ {errors.price}</p>}
               {form.price && (
                 <p className="text-green-400 text-xs mt-1.5">
                   Rs {Number(form.price).toLocaleString()}/hr
@@ -194,7 +246,6 @@ export default function GuardPage() {
 
             <div className="flex justify-between items-center mt-3">
               <span className="text-yellow-400 text-sm">★ {guard.rating || "5.0"}</span>
-              {/* NPR price */}
               <span className="text-green-300 font-semibold text-sm">
                 Rs {Number(guard.price).toLocaleString()}/hr
               </span>
