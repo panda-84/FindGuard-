@@ -18,3 +18,6 @@ router.post("/login",    login);
 
 router.get("/users",        authMiddleware, roleMiddleware("admin"), getAllUsers);
 router.delete("/users/:id", authMiddleware, roleMiddleware("admin"), deleteUser);
+router.get("/verify", authMiddleware, (req, res) => {
+  res.status(200).json({ valid: true });
+});

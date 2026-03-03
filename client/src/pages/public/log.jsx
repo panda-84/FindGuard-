@@ -1,4 +1,4 @@
-// log.jsx - Login with proper validation + show/hide password
+
 
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import { useState } from "react";
 import bgImage from "../../assets/image.png";
 import logo    from "../../assets/Untitled.png";
 import { useApi } from "../../hooks/useAPI";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -93,7 +94,10 @@ const Login = () => {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-300 hover:text-white transition text-lg"
                 >
-                  {showPassword ? "🙈" : "👁"}
+                  {showPassword
+  ? <EyeOff className="w-5 h-5" />
+  : <Eye    className="w-5 h-5" />
+}
                 </button>
               </div>
               {errors.password && (
