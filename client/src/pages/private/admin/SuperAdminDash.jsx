@@ -61,6 +61,16 @@ export default function SuperAdminDash() {
     } catch (err) { showMessage("❌ " + err.message); }
   };
 
+
+  const handleDeleteUser = async (id, name) => {
+    if (!window.confirm(`Delete user "${name}"? This cannot be undone.`)) return;
+    try {
+      await callApi("DELETE", `/auth/users/${id}`);
+      showMessage("🗑 User deleted successfully!");
+      loadAll();
+    } catch (err) { showMessage("❌ " + err.message); }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("role");
@@ -152,15 +162,17 @@ export default function SuperAdminDash() {
           {!loading && currentPage === "dashboard" && (
             <div className="space-y-6">
               <h1 className="text-2xl md:text-3xl font-bold text-white">System Overview 👑</h1>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 {[
-                  { label: "Total Companies",  value: companies.length, color: "from-blue-700 to-blue-900"     },
-                  { label: "Pending Approval", value: pending,          color: "from-yellow-700 to-yellow-900" },
-                  { label: "Total Guards",     value: guards.length,    color: "from-green-700 to-green-900"   },
-                  { label: "Total Bookings",   value: bookings.length,  color: "from-purple-700 to-purple-900" },
+                  { label: "Total Companies",  value: companies.length, color: "from-blue-700 to-blue-900",     icon: "🏢" },
+                  { label: "Pending Approval", value: pending,          color: "from-yellow-700 to-yellow-900", icon: "⏳" },
+                  { label: "Total Guards",     value: guards.length,    color: "from-green-700 to-green-900",   icon: "🛡" },
+                  { label: "Total Bookings",   value: bookings.length,  color: "from-purple-700 to-purple-900", icon: "📋" },
+                  { label: "Total Users",      value: allUsers.length,  color: "from-pink-700 to-pink-900",     icon: "👥" },
                 ].map((stat) => (
                   <div key={stat.label}
                     className={`bg-gradient-to-br ${stat.color} rounded-2xl p-5 shadow-lg hover:scale-105 transform transition-all`}>
+                    <p className="text-2xl mb-1">{stat.icon}</p>
                     <p className="text-3xl font-black text-white">{stat.value}</p>
                     <p className="text-blue-200 text-sm mt-1">{stat.label}</p>
                   </div>
@@ -360,6 +372,14 @@ export default function SuperAdminDash() {
                           {u.role}
                         </span>
                       </div>
+                      {u.role !== "admin" && (
+                        <button
+                          onClick={() => handleDeleteUser(u.id, u.name)}
+                          className="mt-3 w-full py-1.5 rounded-lg text-xs font-bold text-red-400
+                            border border-red-400/30 hover:bg-red-500/20 transition">
+                          🗑 Delete User
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>

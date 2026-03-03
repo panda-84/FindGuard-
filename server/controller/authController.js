@@ -220,3 +220,27 @@ export const deleteById = async (req, res) => {
     res.status(500).json({ message: "Delete failed" });
   }
 };
+
+export const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await Users.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Prevent deleting admin accounts
+    if (user.role === "admin") {
+      return res.status(403).json({ message: "Cannot delete admin accounts" });
+    }
+
+    await user.destroy();
+
+    return res.status(200).json({ message: "User deleted successfully" });
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
