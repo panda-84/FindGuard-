@@ -1,5 +1,3 @@
-// pages/private/company/ComDash.jsx
-
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";
 import bgImage from "../../../assets/image.png";
@@ -19,7 +17,6 @@ export default function ComDash() {
   const [setupLoading, setSetupLoading] = useState(false);
 
   useEffect(() => { loadData(); }, []);
-
   const loadData = async () => {
     setLoading(true);
     try {
@@ -38,7 +35,6 @@ export default function ComDash() {
     } catch (err) {}
     setLoading(false);
   };
-
   const handleSetup = async () => {
     if (!setupForm.name) { setMessage("Company name is required!"); return; }
     setSetupLoading(true);
@@ -52,7 +48,6 @@ export default function ComDash() {
       setSetupLoading(false);
     }
   };
-
   const handleLogout = () => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("role");
@@ -63,7 +58,6 @@ export default function ComDash() {
     border-none outline-none placeholder-blue-300/50
     hover:shadow-[0_0_15px_rgba(168,85,247,0.3)] transition`;
 
-  // LOADING
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
@@ -71,8 +65,6 @@ export default function ComDash() {
       </div>
     );
   }
-
-  // NO COMPANY PROFILE → SETUP FORM
   if (!company) {
     return (
       <div className="min-h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url(${bgImage})` }}>

@@ -1,5 +1,3 @@
-// booking.jsx
-// Company can see and confirm/cancel bookings
 
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";

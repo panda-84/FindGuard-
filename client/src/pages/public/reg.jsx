@@ -1,5 +1,3 @@
-// reg.jsx - Register with proper validation + show/hide password
-
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";

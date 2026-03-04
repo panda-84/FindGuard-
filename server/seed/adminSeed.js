@@ -1,6 +1,4 @@
-// seed/adminSeed.js
-// Run ONCE to create super admin account
-// Command: node seed/adminSeed.js
+
 
 import bcrypt         from "bcrypt";
 import { Users }      from "../model/userModel.js";

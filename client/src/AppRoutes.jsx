@@ -1,21 +1,13 @@
-// AppRoutes.jsx
 import React, { Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { PublicRoute }  from "./routes/PublicRoute";
 import { PrivateRoute } from "./routes/PrivateRoute";
-
-// PUBLIC
 import LoginPage      from "./pages/public/log";
 import SignupPage     from "./pages/public/reg";
 import ForgetPassword from "./pages/public/fog";
-
-// CUSTOMER
+import ResetPassword  from "./pages/public/ResetPassword";
 import CustomerDashboard from "./pages/private/user/CustomerDashboard";
-
-// COMPANY
 import ComDash from "./pages/private/company/ComDash";
-
-// SUPER ADMIN
 import SuperAdminDash from "./pages/private/admin/SuperAdminDash";
 
 export const AppRoutes = () => (
@@ -25,14 +17,13 @@ export const AppRoutes = () => (
     </div>
   }>
     <Routes>
-
       <Route path="/" element={<Navigate to="/login" replace />} />
-
       {/* PUBLIC */}
       <Route element={<PublicRoute />}>
         <Route path="/login"           element={<LoginPage />} />
         <Route path="/register"        element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgetPassword />} />
+        <Route path="/reset-password"  element={<ResetPassword />} />
       </Route>
 
       {/* CUSTOMER */}

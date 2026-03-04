@@ -1,5 +1,3 @@
-
-
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -143,5 +141,4 @@ const Login = () => {
     </div>
   );
 };
-
 export default Login;

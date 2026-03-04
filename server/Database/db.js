@@ -1,16 +1,21 @@
 import { Sequelize } from "sequelize";
 
-export const sequelize = new Sequelize(
-  "FindGuard",        // database name (must exist)
-  "postgres",         // username
-  "2062/9/22",      // ⚠️ CHANGE to your real password
-  {
-    host: "127.0.0.1", // IMPORTANT on Windows
-    port: 5432,
-    dialect: "postgres",
-    logging: false,
-  }
-);
+const isTest = process.env.NODE_ENV === "test";
+
+// Use in-memory SQLite for tests, otherwise use PostgreSQL
+export const sequelize = isTest
+  ? new Sequelize("sqlite::memory:", { logging: false })
+  : new Sequelize(
+      process.env.DB_NAME || "FindGuard",
+      process.env.DB_USER || "postgres",
+      process.env.DB_PASS || "2062/9/22",
+      {
+        host: process.env.DB_HOST || "127.0.0.1",
+        port: process.env.DB_PORT || 5432,
+        dialect: "postgres",
+        logging: false,
+      }
+    );
 
 export const connection = async () => {
   try {

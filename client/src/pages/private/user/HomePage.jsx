@@ -1,5 +1,3 @@
-// pages/private/user/HomePage.jsx
-
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";
 import bgImage from "../../../assets/ads/home.png";
@@ -8,25 +6,20 @@ export default function HomePage() {
   const { callApi } = useApi();
   const [stats,   setStats]   = useState({ companies: 0, guards: 0, bookings: 0 });
   const [loading, setLoading] = useState(true);
-
   const name = localStorage.getItem("userName") || "there";
 
   useEffect(() => { loadStats(); }, []);
-
   const loadStats = async () => {
     try {
       const [compRes, guardRes] = await Promise.all([
         callApi("GET", "/companies"),
         callApi("GET", "/guards"),
       ]);
-
-      // Load bookings separately so it doesn't block other stats
       let bookingCount = 0;
       try {
         const bookRes = await callApi("GET", "/profile/bookings");
         bookingCount = bookRes?.data?.data?.length || 0;
       } catch (e) {}
-
       setStats({
         companies: compRes?.data?.data?.length  || 0,
         guards:    guardRes?.data?.data?.length || 0,
@@ -38,17 +31,14 @@ export default function HomePage() {
       setLoading(false);
     }
   };
-
   const statCards = [
     { label: "Security Companies", value: stats.companies, icon: "🏢", color: "from-blue-700 to-blue-900"     },
     { label: "Available Guards",   value: stats.guards,    icon: "🛡", color: "from-green-700 to-green-900"   },
     { label: "My Bookings",        value: stats.bookings,  icon: "📋", color: "from-purple-700 to-purple-900" },
   ];
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-900 to-black">
       <main className="max-w-7xl mx-auto px-6 py-12 space-y-8">
-
         {/* Welcome */}
         <div className="text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
@@ -56,7 +46,6 @@ export default function HomePage() {
           </h1>
           <p className="text-blue-300 text-lg">Your security management portal</p>
         </div>
-
          <div className="bg-gray-500 h-50 rounded-lg mb-12">
                   <img src={bgImage} alt="Company Header" className="w-full h-full object-cover rounded-lg" />
                 </div>
@@ -75,7 +64,6 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-
         {/* About */}
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8
           border border-white/10 shadow-[0_0_30px_rgba(168,85,248,0.2)]">
@@ -86,7 +74,6 @@ export default function HomePage() {
             guards, and book professional security services in just a few clicks.
           </p>
         </div>
-
         {/* Feature Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
