@@ -1,4 +1,3 @@
-// hooks/useAPI.js
 
 import { useState } from "react";
 import { apiRequest } from "../utils/api";
@@ -11,7 +10,6 @@ export const useApi = () => {
     setLoading(true);
     setError("");
     try {
-      // Always pass options as object, never null
       const res = await apiRequest(method, endpoint, options || {});
       setLoading(false);
       return res;

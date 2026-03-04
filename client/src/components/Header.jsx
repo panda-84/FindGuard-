@@ -1,4 +1,3 @@
-// components/Header.jsx
 
 import React, { useState } from 'react';
 import logo from '../assets/Untitled.png';
@@ -42,7 +41,6 @@ export default function Header({ currentPage, setCurrentPage }) {
             ))}
           </nav>
 
-          {/* Profile Button */}
           <div className="ml-auto">
             <button
               onClick={() => setProfileOpen(!profileOpen)}

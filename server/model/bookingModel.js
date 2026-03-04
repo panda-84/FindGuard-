@@ -1,4 +1,3 @@
-// model/bookingModel.js
 
 import { DataTypes } from "sequelize";
 import { sequelize } from "../Database/db.js";

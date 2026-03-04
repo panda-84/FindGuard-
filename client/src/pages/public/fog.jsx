@@ -1,5 +1,3 @@
-// fog.jsx
-// Forgot Password page
 
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
@@ -33,7 +31,6 @@ const ForgetPassword = () => {
             hover:shadow-[0_0_40px_rgba(168,85,248,0.9)]
             transition duration-300"
         >
-          {/* LEFT SIDE */}
           <div className="w-full md:w-2/3 flex flex-col justify-center">
             <h1 className="font-bold text-2xl md:text-3xl text-center text-white mb-4">
               Forgot Password
@@ -43,7 +40,6 @@ const ForgetPassword = () => {
               Enter your email and we'll send you a reset link
             </p>
 
-            {/* Email */}
             <div className="mb-8 w-full max-w-[400px] mx-auto">
               <label className="block text-white text-sm font-bold mb-2">
                 Email
@@ -64,7 +60,6 @@ const ForgetPassword = () => {
               )}
             </div>
 
-            {/* Button */}
             <div className="w-full max-w-[400px] mx-auto flex justify-center">
               <button
                 type="submit"
@@ -77,7 +72,6 @@ const ForgetPassword = () => {
               </button>
             </div>
 
-            {/* Back to Login */}
             <div className="mt-6 text-center">
               <Link className="text-blue-400" to="/login">
                 ← Back to Login
@@ -85,7 +79,6 @@ const ForgetPassword = () => {
             </div>
           </div>
 
-          {/* RIGHT SIDE - Logo */}
           <div className="hidden md:flex w-1/3 items-center justify-center">
             <img src={logo} alt="Logo" />
           </div>
@@ -95,5 +88,4 @@ const ForgetPassword = () => {
   );
 };
 
-// ✅ THIS IS THE FIX - must have default export
 export default ForgetPassword;

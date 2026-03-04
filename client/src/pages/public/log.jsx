@@ -73,7 +73,6 @@ const Login = () => {
               )}
             </div>
 
-            {/* Password with show/hide */}
             <div className="mb-6 w-full max-w-[400px] mx-auto">
               <label className="block text-white text-sm font-bold mb-2">Password</label>
               <div className="relative">

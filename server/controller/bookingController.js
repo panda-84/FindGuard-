@@ -1,4 +1,3 @@
-// bookingController.js
 
 import { Op }        from "sequelize";
 import { Bookings }  from "../model/bookingModel.js";
@@ -6,7 +5,6 @@ import { Guards }    from "../model/guardModel.js";
 import { Companies } from "../model/companyModel.js";
 import { Users }     from "../model/userModel.js";
 
-// ── CREATE BOOKING ─────────────────────────────
 export const createBooking = async (req, res) => {
   try {
     const {
@@ -150,8 +148,6 @@ export const cancelBooking = async (req, res) => {
     booking.status = "cancelled";
     await booking.save();
 
-    // Guard was only pending so no need to change guard status
-    // Guard status only changes on confirmed → cancelled
 
     res.status(200).json({ message: "Booking cancelled!" });
   } catch (err) {

@@ -1,4 +1,3 @@
-// components/SecurityCard.jsx
 
 import React from "react";
 
@@ -36,7 +35,6 @@ export default function SecurityCard({ security, onClick }) {
         <span className="text-white font-medium">{security.rating || "5.0"}</span>
       </div>
 
-      {/* NPR price */}
       <p className="text-green-300 font-semibold">
         Rs {price.toLocaleString()}/hr
       </p>

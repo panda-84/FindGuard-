@@ -1,9 +1,7 @@
-// controller/companyController.js
 
 import { Companies } from "../model/companyModel.js";
 import { Users }     from "../model/userModel.js";
 
-// ── GET ALL APPROVED (customers) ────────────────
 export const getAllApproved = async (req, res) => {
   try {
     const companies = await Companies.findAll({
@@ -16,7 +14,6 @@ export const getAllApproved = async (req, res) => {
   }
 };
 
-// ── GET MY COMPANY (company user) ───────────────
 export const getMyCompany = async (req, res) => {
   try {
     const company = await Companies.findOne({ where: { userId: req.user.id } });
@@ -28,7 +25,6 @@ export const getMyCompany = async (req, res) => {
   }
 };
 
-// ── CREATE COMPANY ───────────────────────────────
 export const createCompany = async (req, res) => {
   try {
     const { name, logo, location, description } = req.body;

@@ -1,5 +1,3 @@
-// middleware/roleMiddleware.js
-// Checks if the logged in user has the correct role
 
 export const roleMiddleware = (allowedRole) => {
   return (req, res, next) => {

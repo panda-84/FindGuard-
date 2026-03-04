@@ -151,7 +151,6 @@ const Register = () => {
               {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone.message}</p>}
             </div>
 
-            {/* Date of Birth */}
             <div className="mb-3 w-full max-w-[400px] mx-auto">
               <label className="block text-white text-sm font-bold mb-1">Date of Birth</label>
               <input
@@ -171,7 +170,6 @@ const Register = () => {
               {errors.dob && <p className="text-red-400 text-xs mt-1">{errors.dob.message}</p>}
             </div>
 
-            {/* Password with show/hide */}
             <div className="mb-3 w-full max-w-[400px] mx-auto">
               <label className="block text-white text-sm font-bold mb-1">Password</label>
               <div className="relative">

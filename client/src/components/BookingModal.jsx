@@ -1,19 +1,14 @@
-// components/BookingModal.jsx
-// 2 steps only + proper NPR calculation
+
 
 import React, { useState } from "react";
 import { X, CreditCard } from "lucide-react";
 import { useApi } from "../hooks/useAPI";
 
-// Nepal market rate
-const NPR_PER_HOUR = 800; // Rs 800/hr base rate for guards in Nepal
+const NPR_PER_HOUR = 800; 
 
-// Calculate cost properly in NPR
 const calculateCost = (guard, duration, durationType, hoursPerDay) => {
   if (!duration) return { totalHours: 0, totalNPR: 0, rateNPR: 0 };
 
-  // Use guard price directly as NPR hourly rate
-  // If price is small (like 5-50) it's USD → convert. If large (like 500+) it's already NPR
   const rawPrice  = parseFloat(guard.hourlyRate || guard.price || 0);
   const rateNPR   = rawPrice < 100 ? Math.round(rawPrice * 133) : Math.round(rawPrice);
 
@@ -75,7 +70,6 @@ export default function BookingModal({ guard, onClose, companyName }) {
     formData.hoursPerDay,
   );
 
-  // Validate all fields in step 1
   const validateStep1 = () => {
     const e = {};
     if (!formData.startDate)    e.startDate    = "Start date is required";
@@ -92,7 +86,6 @@ export default function BookingModal({ guard, onClose, companyName }) {
 
   const handleNext = () => { if (validateStep1()) setStep(2); };
 
-  // Submit to API
   const handleConfirm = async () => {
     setLoading(true);
     setApiError("");

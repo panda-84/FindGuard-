@@ -1,5 +1,4 @@
-// pages/private/user/allSecurities.jsx
-// Loads real guards from API
+
 
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";

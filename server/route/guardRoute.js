@@ -15,13 +15,10 @@ import { roleMiddleware } from "../middleware/roleMiddleware.js";
 
 export const router = express.Router();
 
-// ── ADMIN ONLY (must be BEFORE /:id routes) ───
 router.get("/all", authMiddleware, roleMiddleware("admin"), getAllGuardsAdmin);
 
-// ── ALL LOGGED IN USERS ───────────────────────
 router.get("/", authMiddleware, getAllGuards);
 
-// ── COMPANY ONLY ──────────────────────────────
 router.get(   "/mine",       authMiddleware, roleMiddleware("company"), getMyGuards);
 router.post(  "/",           authMiddleware, roleMiddleware("company"), addGuard);
 router.put(   "/:id",        authMiddleware, roleMiddleware("company"), updateGuard);

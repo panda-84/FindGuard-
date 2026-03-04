@@ -1,9 +1,7 @@
-// controller/guardController.js
 
 import { Guards }    from "../model/guardModel.js";
 import { Companies } from "../model/companyModel.js";
 
-// ── ADD GUARD ───────────────────────────────────
 export const addGuard = async (req, res) => {
   try {
     const { name, badge, phone, experience, shift, zone, price } = req.body;
@@ -30,7 +28,6 @@ export const addGuard = async (req, res) => {
   }
 };
 
-// ── GET MY GUARDS (company) ─────────────────────
 export const getMyGuards = async (req, res) => {
   try {
     const company = await Companies.findOne({ where: { userId: req.user.id } });
@@ -47,7 +44,6 @@ export const getMyGuards = async (req, res) => {
   }
 };
 
-// ── GET ALL AVAILABLE GUARDS (customers) ────────
 export const getAllGuards = async (req, res) => {
   try {
     const { companyId } = req.query;
@@ -67,7 +63,6 @@ export const getAllGuards = async (req, res) => {
   }
 };
 
-// ── GET ALL GUARDS (admin) ──────────────────────
 export const getAllGuardsAdmin = async (req, res) => {
   try {
     const guards = await Guards.findAll({

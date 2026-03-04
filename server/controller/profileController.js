@@ -1,4 +1,3 @@
-// controller/profileController.js
 
 import { Users }     from "../model/userModel.js";
 import { Bookings }  from "../model/bookingModel.js";
@@ -6,7 +5,6 @@ import { Guards }    from "../model/guardModel.js";
 import { Companies } from "../model/companyModel.js";
 import bcrypt        from "bcrypt";
 
-// GET /api/profile
 export const getProfile = async (req, res) => {
   try {
     const user = await Users.findByPk(req.user.id, {
@@ -20,7 +18,6 @@ export const getProfile = async (req, res) => {
   }
 };
 
-// PUT /api/profile
 export const updateProfile = async (req, res) => {
   try {
     const { name, phone, dob, password } = req.body;
@@ -43,7 +40,6 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-// GET /api/profile/bookings
 export const getMyBookings = async (req, res) => {
   try {
     const bookings = await Bookings.findAll({
@@ -53,7 +49,6 @@ export const getMyBookings = async (req, res) => {
           model: Guards,
           as: "guard",
           attributes: ["id", "name", "photo"],
-          // Include company inside guard
           include: [{
             model: Companies,
             attributes: ["id", "name"],
@@ -72,7 +67,6 @@ export const getMyBookings = async (req, res) => {
   } catch (err) {
     console.error("Get my bookings error:", err.message);
 
-    // If association error, try without includes
     try {
       const bookings = await Bookings.findAll({
         where: { customerId: req.user.id },
@@ -86,7 +80,6 @@ export const getMyBookings = async (req, res) => {
   }
 };
 
-// GET /api/profile/guards
 export const getMyGuards = async (req, res) => {
   try {
     const bookings = await Bookings.findAll({

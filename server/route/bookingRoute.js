@@ -15,14 +15,14 @@ import { roleMiddleware } from "../middleware/roleMiddleware.js";
 
 export const router = express.Router();
 
-// ── CUSTOMER ONLY ─────────────────────────────
+// ── CUSTOMER ONLY 
 router.get(    "/mine",    authMiddleware, roleMiddleware("customer"), getMyBookings);
 router.post(   "/",        authMiddleware, roleMiddleware("customer"), createBooking);
 router.delete( "/:id",     authMiddleware, roleMiddleware("customer"), cancelBooking);
 
-// ── COMPANY ONLY ──────────────────────────────
+// ── COMPANY ONLY 
 router.get(   "/company",  authMiddleware, roleMiddleware("company"), getCompanyBookings);
 router.patch( "/:id",      authMiddleware, roleMiddleware("company"), updateBookingStatus);
 
-// ── ADMIN ONLY ────────────────────────────────
+// ── ADMIN ONLY 
 router.get("/all",         authMiddleware, roleMiddleware("admin"), getAllBookings);

@@ -1,5 +1,3 @@
-// pages/private/user/MyBookings.jsx
-// Customer sees all their bookings with status
 
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";

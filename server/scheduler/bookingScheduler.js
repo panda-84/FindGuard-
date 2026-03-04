@@ -1,13 +1,10 @@
-// scheduler/bookingScheduler.js
-// Runs every hour to check if any bookings have ended
-// If booking ended → set guard back to "available"
+
 
 import cron     from "node-cron";
 import { Op }   from "sequelize";
 import { Bookings } from "../model/bookingModel.js";
 import { Guards }   from "../model/guardModel.js";
 
-// Calculate booking end date based on duration
 const getEndDate = (booking) => {
   const start    = new Date(booking.startDate);
   const duration = booking.duration;
@@ -21,14 +18,12 @@ const getEndDate = (booking) => {
 
 export const startBookingScheduler = () => {
 
-  // Run every hour at :00
   cron.schedule("0 * * * *", async () => {
     console.log("⏰ Checking for ended bookings...");
 
     try {
       const now = new Date();
 
-      // Get all confirmed bookings
       const confirmedBookings = await Bookings.findAll({
         where: { status: "confirmed" },
       });
@@ -36,15 +31,12 @@ export const startBookingScheduler = () => {
       for (const booking of confirmedBookings) {
         const endDate = getEndDate(booking);
 
-        // If booking has ended
         if (now >= endDate) {
           console.log(`✅ Booking #${booking.id} ended → releasing guard #${booking.guardId}`);
 
-          // Mark booking as completed
           booking.status = "completed";
           await booking.save();
 
-          // Check if guard has any other active confirmed bookings
           const otherActive = await Bookings.count({
             where: {
               guardId: booking.guardId,
@@ -53,7 +45,6 @@ export const startBookingScheduler = () => {
             },
           });
 
-          // If no other active bookings → set guard available again
           if (otherActive === 0) {
             await Guards.update(
               { status: "available" },

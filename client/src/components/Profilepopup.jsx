@@ -10,21 +10,18 @@ export default function ProfilePopup({ onClose }) {
   const [message, setMessage] = useState("");
   const [photo,   setPhoto]   = useState(null);
 
-  // Real data from API
   const [name,  setName]  = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [dob,   setDob]   = useState("");
   const [role,  setRole]  = useState("");
 
-  // Temp values while editing
   const [tempName,  setTempName]  = useState("");
   const [tempPhone, setTempPhone] = useState("");
   const [tempDob,   setTempDob]   = useState("");
 
   const fileInputRef = useRef(null);
 
-  // ── LOAD PROFILE FROM API ──
   useEffect(() => { loadProfile(); }, []);
 
   const loadProfile = async () => {

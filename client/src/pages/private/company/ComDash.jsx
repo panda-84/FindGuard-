@@ -117,7 +117,7 @@ export default function ComDash() {
     );
   }
 
-  // PENDING
+  
   if (company?.status === "pending") {
     return (
       <div className="min-h-screen w-full bg-cover bg-center" style={{ backgroundImage: `url(${bgImage})` }}>
@@ -181,7 +181,7 @@ export default function ComDash() {
         {/* SIDEBAR */}
         <aside className="hidden md:flex w-56 flex-col bg-black/40 backdrop-blur-md border-r border-blue-500/20">
           <div className="px-5 py-6 border-b border-blue-500/20">
-            <p className="text-white font-black text-lg">🛡 GuardOps</p>
+            <p className="text-white font-black text-lg">🛡 COMPANY </p>
             <p className="text-blue-300 text-xs mt-1">{company?.name}</p>
             <span className="text-xs font-bold px-2 py-0.5 rounded-full mt-2 inline-block bg-green-400/20 text-green-400">
               {company?.status}

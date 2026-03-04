@@ -2,7 +2,6 @@ import { Sequelize } from "sequelize";
 
 const isTest = process.env.NODE_ENV === "test";
 
-// Use in-memory SQLite for tests, otherwise use PostgreSQL
 export const sequelize = isTest
   ? new Sequelize("sqlite::memory:", { logging: false })
   : new Sequelize(

@@ -12,7 +12,6 @@ import { authMiddleware } from "../middleware/authMiddleware.js";
 
 export const router = express.Router();
 
-// All profile routes need a valid token
 router.get( "/",         authMiddleware, getProfile);
 router.put( "/",         authMiddleware, updateProfile);
 router.get( "/bookings", authMiddleware, getMyBookings);

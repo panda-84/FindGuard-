@@ -1,5 +1,4 @@
-// pages/private/user/companies.jsx
-// Loads real companies + guards from API
+
 
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../hooks/useAPI";
@@ -29,7 +28,6 @@ export default function CompaniesPage() {
     }
   };
 
-  // Load guards for a specific company when expanded
   const handleCompanyClick = async (company) => {
     if (selectedCompany?.id === company.id) {
       setSelectedCompany(null);
@@ -37,7 +35,6 @@ export default function CompaniesPage() {
     }
     setSelectedCompany(company);
 
-    // Load guards for this company if not already loaded
     if (!guardsMap[company.id]) {
       try {
         const res = await callApi("GET", `/guards?companyId=${company.id}`);
