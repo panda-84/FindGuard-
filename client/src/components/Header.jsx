@@ -1,10 +1,11 @@
-
+// Header.jsx
 import React, { useState } from 'react';
 import logo from '../assets/Untitled.png';
 import ProfilePopup from './ProfilePopup.jsx';
 
 export default function Header({ currentPage, setCurrentPage }) {
   const [profileOpen, setProfileOpen] = useState(false);
+  const [menuOpen,    setMenuOpen]    = useState(false);
   const name = localStorage.getItem("userName") || "User";
 
   const navItems = [
@@ -16,21 +17,19 @@ export default function Header({ currentPage, setCurrentPage }) {
 
   return (
     <>
-      <header className="bg-black shadow-lg h-[160px] flex items-center relative z-50">
-        <div className="flex items-center w-full px-4">
+      <header className="bg-black shadow-lg relative z-50">
+        <div className="flex items-center justify-between px-4 py-2">
 
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <img src={logo} alt="Logo" className="h-[200px] w-[150px]" />
-          </div>
+          <img src={logo} alt="Logo" className="h-16 w-auto object-contain" />
 
-          {/* Nav */}
-          <nav className="space-x-4 ml-[200px] flex items-center">
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex items-center gap-2">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => setCurrentPage(item.id)}
-                className={`px-5 py-2 rounded-lg font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
                   currentPage === item.id
                     ? "bg-white text-gray-800"
                     : "bg-blue-300 text-white hover:bg-blue-200"
@@ -41,25 +40,49 @@ export default function Header({ currentPage, setCurrentPage }) {
             ))}
           </nav>
 
-          <div className="ml-auto">
+          {/* Right side */}
+          <div className="flex items-center gap-3">
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="w-16 h-11 mr-10 rounded-full bg-blue-700 hover:bg-blue-500
-                flex items-center justify-center text-white font-bold text-lg
-                border-2 border-blue-400
-                hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]
-                transition duration-300"
+              className="w-10 h-10 rounded-full bg-blue-700 hover:bg-blue-500
+                flex items-center justify-center text-white font-bold text-base
+                border-2 border-blue-400 transition duration-300
+                hover:shadow-[0_0_20px_rgba(168,85,247,0.6)]"
             >
               {name.charAt(0).toUpperCase()}
             </button>
-          </div>
 
+            {/* Mobile hamburger */}
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="md:hidden text-white text-2xl w-10 h-10 flex items-center justify-center"
+            >
+              {menuOpen ? "✕" : "☰"}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Nav Dropdown */}
+        {menuOpen && (
+          <div className="md:hidden bg-black/95 border-t border-blue-500/20 px-4 py-3 space-y-2">
+            {navItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setCurrentPage(item.id); setMenuOpen(false); }}
+                className={`w-full text-left px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${
+                  currentPage === item.id
+                    ? "bg-white text-gray-800"
+                    : "bg-blue-500/20 text-white hover:bg-blue-500/40"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        )}
       </header>
 
-      {profileOpen && (
-        <ProfilePopup onClose={() => setProfileOpen(false)} />
-      )}
+      {profileOpen && <ProfilePopup onClose={() => setProfileOpen(false)} />}
     </>
   );
 }
